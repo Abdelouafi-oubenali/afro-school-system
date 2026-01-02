@@ -1,5 +1,5 @@
 package org.example.userservice.enums;
 
 public enum Role {
-    ADMIN, ENSEIGMENT, PARENT, ELEVE
+    ADMIN, ENSEIGNANT, PARENT, ELEVE
 }

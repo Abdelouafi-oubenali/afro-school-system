@@ -1,6 +1,7 @@
 package org.example.userservice.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import org.example.userservice.enums.Role;
 
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "user_type")
+@Data
 public abstract class User {
 
     @Id
