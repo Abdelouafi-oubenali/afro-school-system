@@ -2,12 +2,14 @@ package org.example.userservice.service;
 
 import org.example.userservice.dto.AdminResponseDTO;
 import org.example.userservice.dto.CreateUserRequest;
+import org.example.userservice.dto.EnseignantResponseDTO;
 import org.example.userservice.dto.UserResponseDTO;
 import org.example.userservice.entity.Admin;
 import org.example.userservice.entity.Eleve;
 import org.example.userservice.entity.Enseignant;
 import org.example.userservice.entity.User;
 import org.example.userservice.enums.Role;
+import org.example.userservice.exception.InvalidEnseignantException;
 import org.example.userservice.exception.UserAlreadyExistsException;
 import org.example.userservice.mapper.UserMapper;
 import org.example.userservice.repository.AdminRepository;
@@ -83,6 +85,7 @@ public class UserService {
     }
 
 
+    // Admin 
     public AdminResponseDTO createAdmin(CreateUserRequest dto) {
 
         if(userRepository.findByEmail(dto.getEmail()).isPresent()){
@@ -101,6 +104,39 @@ public class UserService {
 
         Admin saved = userRepository.save(admin);
         return userMapper.toAdminResponse(saved);
+    }
+
+
+    //ENSEIGNANT
+    public EnseignantResponseDTO createEnseignent(CreateUserRequest dto)
+    {
+        if(userRepository.findByEmail(dto.getEmail()).isPresent())
+        {
+            throw new UserAlreadyExistsException("User already exists with email: " + dto.getEmail());
+        }
+
+        if (dto.getSpecialite() == null || dto.getDateEmbauche() == null) {
+            throw new InvalidEnseignantException(
+                    "specialite et dateEmbauche sont obligatoires pour un Enseignant"
+            );
+        }
+        Enseignant enseignant = new Enseignant();
+
+        enseignant.setId(UUID.randomUUID());
+        enseignant.setNom(dto.getNom());
+        enseignant.setPrenom(dto.getPrenom());
+        enseignant.setEmail(dto.getEmail());
+        enseignant.setPassword(passwordEncoder.encode(dto.getPassword()));
+        enseignant.setPhone(dto.getPhone());
+        enseignant.setDateNaissance(dto.getDateNaissance());
+        enseignant.setRole(Role.ENSEIGNANT);
+        enseignant.setMatricule(generateUniqueMatricule());
+        enseignant.setDateEmbauche(dto.getDateEmbauche());
+        enseignant.setSpecialite(dto.getSpecialite());
+
+        Enseignant save = userRepository.save(enseignant) ;
+        return  userMapper.toEnseigmentResponse(save) ;
+
     }
 
 

@@ -1,6 +1,7 @@
 package org.example.userservice.mapper;
 
 import org.example.userservice.dto.AdminResponseDTO;
+import org.example.userservice.dto.EnseignantResponseDTO;
 import org.example.userservice.dto.UserResponseDTO;
 import org.example.userservice.entity.*;
 import org.example.userservice.enums.Role;
@@ -16,6 +17,9 @@ public interface UserMapper {
 
     // Admin
     AdminResponseDTO toAdminResponse(Admin admin);
+
+    //enseignant
+    EnseignantResponseDTO toEnseigmentResponse(Enseignant enseignant) ;
 
 }
 

@@ -3,6 +3,7 @@ package org.example.userservice.controller;
 import jakarta.validation.Valid;
 import org.example.userservice.dto.AdminResponseDTO;
 import org.example.userservice.dto.CreateUserRequest;
+import org.example.userservice.dto.EnseignantResponseDTO;
 import org.example.userservice.dto.UserResponseDTO;
 import org.example.userservice.entity.Admin;
 import org.example.userservice.entity.User;
@@ -98,10 +99,22 @@ public class UserController {
     }
 
 
+    // Admin mangement
     @PostMapping("/admins")
     public AdminResponseDTO createAdmin(@Valid @RequestBody CreateUserRequest dto) {
         return userService.createAdmin(dto);
     }
+
+
+    // Enseignent mangement
+    @PostMapping("enseignent")
+    public EnseignantResponseDTO createEnseignent(@Valid @RequestBody CreateUserRequest dto)
+    {
+        return userService.createEnseignent(dto) ;
+    }
+
+
+
 
 
 
