@@ -1,22 +1,26 @@
 package org.example.userservice.service;
 
 import org.example.userservice.dto.*;
-import org.example.userservice.entity.Admin;
-import org.example.userservice.entity.Eleve;
-import org.example.userservice.entity.Enseignant;
-import org.example.userservice.entity.User;
+import org.example.userservice.entity.*;
 import org.example.userservice.enums.Role;
 import org.example.userservice.exception.InvalidEnseignantException;
+import org.example.userservice.exception.ResourceNotFoundException;
 import org.example.userservice.exception.UserAlreadyExistsException;
 import org.example.userservice.mapper.UserMapper;
 import org.example.userservice.repository.AdminRepository;
+import org.example.userservice.repository.EleveRepository;
 import org.example.userservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -32,6 +36,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EleveRepository eleveRepository ;
 
 //    public UserDTO createUser(UserDTO dto) {
 //
@@ -104,8 +111,72 @@ public class UserService {
         return userMapper.toAdminResponse(saved);
     }
 
+    public List<AdminResponseDTO> getAllAdmins() {
+        List<Admin> admins = userRepository.findAllByRole(Role.ADMIN);
+        return admins.stream()
+                .map(userMapper::toAdminResponse)
+                .collect(Collectors.toList());
+    }
 
-    //ENSEIGNANT
+    public Page<AdminResponseDTO> getAllAdmins(Pageable pageable) {
+        Page<Admin> adminsPage = userRepository.findAllByRole(Role.ADMIN, pageable);
+        return adminsPage.map(userMapper::toAdminResponse);
+    }
+
+    public AdminResponseDTO updateAdmin(UUID id, UpdateUserRequest dto) {
+        Admin admin = userRepository.findByIdAndRole(id, Role.ADMIN)
+                .orElseThrow(() -> new ResourceNotFoundException("Admin not found with id: " + id));
+
+        if (dto.getEmail() != null && !dto.getEmail().equals(admin.getEmail())) {
+            userRepository.findByEmail(dto.getEmail())
+                    .ifPresent(existingUser -> {
+                        throw new UserAlreadyExistsException("Email already exists: " + dto.getEmail());
+                    });
+        }
+
+        if (dto.getNom() != null) admin.setNom(dto.getNom());
+        if (dto.getPrenom() != null) admin.setPrenom(dto.getPrenom());
+        if (dto.getEmail() != null) admin.setEmail(dto.getEmail());
+        if (dto.getPhone() != null) admin.setPhone(dto.getPhone());
+        if (dto.getDateNaissance() != null) admin.setDateNaissance(dto.getDateNaissance());
+
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            admin.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        Admin updated = userRepository.save(admin);
+        return userMapper.toAdminResponse(updated);
+    }
+
+    public AdminResponseDTO getAdminById(UUID id)
+    {
+        Admin admin = adminRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Admin not found with id: " + id));
+
+        return userMapper.toAdminResponse(admin) ;
+
+    }
+
+    public void deleteAdmin(UUID id) {
+        Admin admin = userRepository.findByIdAndRole(id, Role.ADMIN)
+                .orElseThrow(() -> new ResourceNotFoundException("Admin not found with id: " + id));
+
+
+        userRepository.delete(admin);
+    }
+
+    public void softDeleteAdmin(UUID id) {
+        Admin admin = userRepository.findByIdAndRole(id, Role.ADMIN)
+                .orElseThrow(() -> new ResourceNotFoundException("Admin not found with id: " + id));
+
+        admin.setActive(false);
+        userRepository.save(admin);
+    }
+
+
+//=================================================================================================================
+    //ENSEIGNANT management
+//=================================================================================================================
     public EnseignantResponseDTO createEnseignent(CreateUserRequest dto)
     {
         if(userRepository.findByEmail(dto.getEmail()).isPresent())
@@ -138,7 +209,7 @@ public class UserService {
     }
 
 
-    //Eleve Managment
+    //Eleve management
     public EleveResponseDTO createEleve(CreateUserRequest dto)
     {
         if(userRepository.findByEmail(dto.getEmail()).isPresent())
@@ -162,12 +233,54 @@ public class UserService {
 
         return userMapper.toEleveResponse(save) ;
 
-
     }
 
+    //Pqrent management
+    public ParentResponseDTO createParent(CreateUserRequest dto) {
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException(" email est dija utulser");
+        }
 
+        if (dto.getChildIds() == null || dto.getChildIds().isEmpty()) {
+            throw new IllegalArgumentException("  Select au moin un envant ");
+        }
 
+        List<Eleve> children = eleveRepository.findAllById(dto.getChildIds());
+        if (children.size() != dto.getChildIds().size()) {
+            throw new IllegalArgumentException("Eleve no trouve pas");
+        }
 
+        Parent parent = new Parent();
+        parent.setId(UUID.randomUUID());
+        parent.setNom(dto.getNom());
+        parent.setPrenom(dto.getPrenom());
+        parent.setEmail(dto.getEmail());
+        parent.setPassword(passwordEncoder.encode(dto.getPassword()));
+        parent.setPhone(dto.getPhone());
+        parent.setDateNaissance(dto.getDateNaissance());
+        parent.setRole(Role.PARENT);
 
+        parent.setChildIds(dto.getChildIds());
+
+        Parent savedParent = (Parent) userRepository.save(parent);
+
+        ParentResponseDTO response = userMapper.toParentResponse(savedParent);
+        response.setChildIds(savedParent.getChildIds());
+
+        return response;
+    }
+
+    public void addChildToParent(UUID parentId, UUID childId) {
+        Parent parent = (Parent) userRepository.findById(parentId)
+                .orElseThrow(() -> new IllegalArgumentException("parent no trouve"));
+
+        eleveRepository.findById(childId)
+                .orElseThrow(() -> new IllegalArgumentException(" Eleve no trouver"));
+
+        if (!parent.getChildIds().contains(childId)) {
+            parent.getChildIds().add(childId);
+            userRepository.save(parent);
+        }
+    }
 
 }

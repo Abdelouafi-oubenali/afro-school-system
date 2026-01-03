@@ -41,7 +41,6 @@ public class CreateUserRequest {
 
     // Parent
     private List<UUID> childIds;
-
     // Enseignant
     private String specialite;
     private LocalDate dateEmbauche;

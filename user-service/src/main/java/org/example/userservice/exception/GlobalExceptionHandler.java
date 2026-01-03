@@ -39,6 +39,23 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    public ResponseEntity<?> handleResourceNotFound(ResourceNotFoundException ex) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                Map.of(
+                        "timestamp", LocalDateTime.now(),
+                        "status", 404,
+                        "error", "NOT_FOUND",
+                        "message", ex.getMessage()
+                )
+        );
+    }
+
 }
 
 class ErrorResponse {

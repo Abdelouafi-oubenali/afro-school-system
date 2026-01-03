@@ -1,9 +1,6 @@
 package org.example.userservice.entity;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -12,5 +9,6 @@ import lombok.Data;
 public class Eleve extends User {
 
     private Long classe;
+
 }
 

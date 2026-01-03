@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -102,8 +103,33 @@ public class UserController {
         return userService.createAdmin(dto);
     }
 
+    @GetMapping("/admins")
+    public List<AdminResponseDTO> getAdminAllAdmins()
+    {
+        return userService.getAllAdmins() ;
+    }
 
-    // Enseignent management
+    @GetMapping("/admins/{id}")
+    public AdminResponseDTO getAdminById(@PathVariable UUID id) {
+        return userService.getAdminById(id);
+    }
+
+
+    @DeleteMapping("admins/{id}")
+    public void deleteAdmin(@PathVariable UUID id)
+    {
+        userService.deleteAdmin(id);
+    }
+
+    @PutMapping("/admins/{id}")
+    public AdminResponseDTO UpdateAdmin(@PathVariable @RequestBody UUID id , UpdateUserRequest dto)
+    {
+        return userService.updateAdmin(id , dto) ;
+    }
+
+
+
+    // Enseignent management ==================================================================================
     @PostMapping("enseignent")
     public EnseignantResponseDTO createEnseignent(@Valid @RequestBody CreateUserRequest dto)
     {
@@ -115,6 +141,14 @@ public class UserController {
     public EleveResponseDTO createEleve(@Valid @RequestBody CreateUserRequest dto)
     {
         return userService.createEleve(dto) ;
+    }
+
+
+    //parent management
+    @PostMapping("parent")
+    public ParentResponseDTO createParent(@Valid @RequestBody CreateUserRequest dto)
+    {
+        return userService.createParent(dto) ;
     }
 
 
