@@ -1,9 +1,16 @@
 package org.example.userservice.controller;
 
+import jakarta.validation.Valid;
+import org.example.userservice.dto.AdminResponseDTO;
+import org.example.userservice.dto.CreateUserRequest;
+import org.example.userservice.dto.UserResponseDTO;
 import org.example.userservice.entity.Admin;
+import org.example.userservice.entity.User;
 import org.example.userservice.enums.Role;
 import org.example.userservice.repository.UserRepository;
+import org.example.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +27,13 @@ public class UserController {
     private UserRepository userRepository;
 
     @Autowired
+    private UserService userService ;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @PostMapping("/create-admin")
+
+    @PostMapping("/create-admin/test")
     public Map<String, Object> createAdminUser(@RequestBody Map<String, String> request) {
         Map<String, Object> response = new HashMap<>();
 
@@ -85,4 +96,14 @@ public class UserController {
 
         return response;
     }
+
+
+    @PostMapping("/admins")
+    public AdminResponseDTO createAdmin(@Valid @RequestBody CreateUserRequest dto) {
+        return userService.createAdmin(dto);
+    }
+
+
+
+
 }

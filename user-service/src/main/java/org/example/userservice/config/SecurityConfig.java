@@ -36,14 +36,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
-                                "/health",
                                 "/api/auth/**",
                                 "/api/test/public",
-                                "/h2-console/**"
+                                "/api/users/**"
                         ).permitAll()
 
                         .requestMatchers("/api/users/create-admin").authenticated()
-                        .requestMatchers("/api/users/**").authenticated()
+                        //.requestMatchers("/api/users/**").authenticated()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
