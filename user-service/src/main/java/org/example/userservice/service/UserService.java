@@ -1,5 +1,6 @@
 package org.example.userservice.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.userservice.dto.*;
 import org.example.userservice.entity.*;
 import org.example.userservice.enums.Role;
@@ -7,10 +8,7 @@ import org.example.userservice.exception.InvalidEnseignantException;
 import org.example.userservice.exception.ResourceNotFoundException;
 import org.example.userservice.exception.UserAlreadyExistsException;
 import org.example.userservice.mapper.UserMapper;
-import org.example.userservice.repository.AdminRepository;
-import org.example.userservice.repository.EleveRepository;
-import org.example.userservice.repository.EnseignantRepository;
-import org.example.userservice.repository.UserRepository;
+import org.example.userservice.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,6 +42,10 @@ public class UserService {
 
     @Autowired
     private EnseignantRepository enseignantRepository ;
+
+
+    @Autowired
+    ParentRepository parentRepository ;
 
 //    public UserDTO createUser(UserDTO dto) {
 //
@@ -458,5 +460,80 @@ public class UserService {
             userRepository.save(parent);
         }
     }
+
+    public ParentResponseDTO getParentById(UUID id) {
+        Parent parent = parentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Parent non trouvé avec l'ID: " + id));
+        return userMapper.toParentResponse(parent);
+    }
+
+    public ParentResponseDTO getParentByEmail(String email) {
+        Parent parent = parentRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Parent non trouvé avec l'email: " + email));
+        return userMapper.toParentResponse(parent);
+    }
+
+    public List<ParentResponseDTO> getAllParents() {
+        List<Parent> parents = parentRepository.findAll();
+        return parents.stream()
+                .map(userMapper::toParentResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<ParentResponseDTO> getParentsByChildId(UUID childId) {
+        List<Parent> parents = parentRepository.findByChildIdsContaining(childId);
+        return parents.stream()
+                .map(userMapper::toParentResponse)
+                .collect(Collectors.toList());
+    }
+
+
+    public void deleteParent(UUID id) {
+        if (!parentRepository.existsById(id)) {
+            throw new EntityNotFoundException("Parent non trouvé avec l'ID: " + id);
+        }
+        parentRepository.deleteById(id);
+    }
+
+
+    public ParentResponseDTO updateParent(UUID parentId, UpdateParentRequest dto) {
+
+        Parent parent = (Parent) userRepository.findById(parentId)
+                .orElseThrow(() -> new IllegalArgumentException("Parent non trouvé"));
+
+        if (!parent.getEmail().equals(dto.getEmail())) {
+            if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+                throw new UserAlreadyExistsException("Email déjà utilisé");
+            }
+            parent.setEmail(dto.getEmail());
+        }
+
+        if (dto.getChildIds() == null || dto.getChildIds().isEmpty()) {
+            throw new IllegalArgumentException("Sélectionnez au moins un enfant");
+        }
+
+        List<Eleve> children = eleveRepository.findAllById(dto.getChildIds());
+        if (children.size() != dto.getChildIds().size()) {
+            throw new IllegalArgumentException("Un ou plusieurs élèves non trouvés");
+        }
+
+        parent.setNom(dto.getNom());
+        parent.setPrenom(dto.getPrenom());
+        parent.setPhone(dto.getPhone());
+        parent.setDateNaissance(dto.getDateNaissance());
+        parent.setChildIds(dto.getChildIds());
+
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            parent.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        Parent updatedParent = (Parent) userRepository.save(parent);
+
+        ParentResponseDTO response = userMapper.toParentResponse(updatedParent);
+        response.setChildIds(updatedParent.getChildIds());
+
+        return response;
+    }
+
 
 }

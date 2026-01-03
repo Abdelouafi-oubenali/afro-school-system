@@ -204,14 +204,37 @@ public class UserController {
 
 
 
-    //parent management
+    //parent management ===============================================================
+
     @PostMapping("parent")
     public ParentResponseDTO createParent(@Valid @RequestBody CreateUserRequest dto)
     {
         return userService.createParent(dto) ;
     }
 
+    @GetMapping("/parent")
+    public List<ParentResponseDTO> getAllParents()
+    {
+        return  userService.getAllParents();
+    }
 
+    @GetMapping("/parent/{id}")
+    public ParentResponseDTO getparentById(@PathVariable UUID id)
+    {
+        return userService.getParentById(id);
+    }
+
+    @DeleteMapping("/parent/{id}")
+    public void deleteParent(@PathVariable UUID id)
+    {
+        userService.deleteParent(id);
+    }
+
+    @PutMapping("/parent/{id}")
+    public ParentResponseDTO updateParent(@PathVariable UUID id , @Valid @RequestBody UpdateParentRequest dto)
+    {
+        return userService.updateParent(id , dto) ;
+    }
 
 
 }
