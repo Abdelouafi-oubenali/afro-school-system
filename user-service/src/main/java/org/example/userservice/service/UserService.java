@@ -327,7 +327,91 @@ public class UserService {
 
     }
 
+    public EleveResponseDTO getEleveById(UUID id) {
+        Eleve eleve = eleveRepository.findByIdAndRole(id, Role.ELEVE)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Élève not found with id: " + id
+                ));
+        return userMapper.toEleveResponse(eleve);
+    }
+
+    public EleveResponseDTO getEleveByEmail(String email) {
+        Eleve eleve = eleveRepository.findByEmailAndRole(email, Role.ELEVE)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Élève not found with email: " + email
+                ));
+        return userMapper.toEleveResponse(eleve);
+    }
+
+
+    public List<EleveResponseDTO> getAllEleves() {
+        List<Eleve> eleves = eleveRepository.findAllByRole(Role.ELEVE);
+        return eleves.stream()
+                .map(userMapper::toEleveResponse)
+                .collect(Collectors.toList());
+    }
+
+    public Page<EleveResponseDTO> getAllEleves(Pageable pageable) {
+        Page<Eleve> elevesPage = eleveRepository.findAllByRole(Role.ELEVE, pageable);
+        return elevesPage.map(userMapper::toEleveResponse);
+    }
+
+    public List<EleveResponseDTO> searchElevesByName(String keyword) {
+        List<Eleve> eleves = eleveRepository.findByNomContainingOrPrenomContainingAndRole(
+                keyword, keyword, Role.ELEVE
+        );
+        return eleves.stream()
+                .map(userMapper::toEleveResponse)
+                .collect(Collectors.toList());
+    }
+
+
+    public void deleteEleve(UUID id) {
+        Eleve eleve = eleveRepository.findByIdAndRole(id, Role.ELEVE)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Élève not found with id: " + id
+                ));
+
+        userRepository.delete(eleve);
+    }
+
+    public void softDeleteEleve(UUID id) {
+        Eleve eleve = eleveRepository.findByIdAndRole(id, Role.ELEVE)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Élève not found with id: " + id
+                ));
+
+        eleve.setActive(false);
+        userRepository.save(eleve);
+    }
+
+
+    public EleveResponseDTO updateEleve(UUID id, CreateUserRequest dto) {
+
+        Eleve eleve = eleveRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Eleve not found"));
+
+        eleve.setNom(dto.getNom());
+        eleve.setPrenom(dto.getPrenom());
+        eleve.setPhone(dto.getPhone());
+        eleve.setDateNaissance(dto.getDateNaissance());
+
+        if(dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            eleve.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        Eleve updated = userRepository.save(eleve);
+
+        return userMapper.toEleveResponse(updated);
+    }
+
+
+
+//======================================================================================================================
     //Pqrent management
+// /=====================================================================================================================
+
+
     public ParentResponseDTO createParent(CreateUserRequest dto) {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new UserAlreadyExistsException(" email est dija utulser");

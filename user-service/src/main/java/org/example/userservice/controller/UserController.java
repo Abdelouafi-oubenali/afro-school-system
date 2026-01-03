@@ -3,6 +3,7 @@ package org.example.userservice.controller;
 import jakarta.validation.Valid;
 import org.example.userservice.dto.*;
 import org.example.userservice.entity.Admin;
+import org.example.userservice.entity.Eleve;
 import org.example.userservice.entity.Enseignant;
 import org.example.userservice.entity.User;
 import org.example.userservice.enums.Role;
@@ -176,6 +177,31 @@ public class UserController {
     {
         return userService.createEleve(dto) ;
     }
+
+    @GetMapping("/eleve")
+    public List<EleveResponseDTO> getAllEleve()
+    {
+        return userService.getAllEleves() ;
+    }
+
+    @GetMapping("/eleve/{id}")
+    public EleveResponseDTO getEleveById(@PathVariable UUID id)
+    {
+        return userService.getEleveById(id) ;
+    }
+
+    @DeleteMapping("/eleve/{id}")
+    public void deleteEleve(@PathVariable UUID id)
+    {
+         userService.deleteEleve(id);
+    }
+
+    @PutMapping("eleve/{id}")
+    public EleveResponseDTO updateEleve(@PathVariable UUID id,
+    @Valid @RequestBody CreateUserRequest dto){
+        return userService.updateEleve(id,dto) ;
+    }
+
 
 
     //parent management
