@@ -9,13 +9,15 @@ import org.example.userservice.exception.UserAlreadyExistsException;
 import org.example.userservice.mapper.UserMapper;
 import org.example.userservice.repository.AdminRepository;
 import org.example.userservice.repository.EleveRepository;
+import org.example.userservice.repository.EnseignantRepository;
 import org.example.userservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +41,9 @@ public class UserService {
 
     @Autowired
     private EleveRepository eleveRepository ;
+
+    @Autowired
+    private EnseignantRepository enseignantRepository ;
 
 //    public UserDTO createUser(UserDTO dto) {
 //
@@ -208,8 +213,95 @@ public class UserService {
 
     }
 
+    public EnseignantResponseDTO getEnseignantById(UUID id) {
+        Enseignant enseignant = enseignantRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Enseignant not found with id: " + id
+                ));
+        return userMapper.toEnseignantResponse(enseignant);
+    }
 
+    public EnseignantResponseDTO getEnseignantByEmail(String email) {
+        Enseignant enseignant = enseignantRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Enseignant not found with email: " + email
+                ));
+        return userMapper.toEnseignantResponse(enseignant);
+    }
+
+    public List<EnseignantResponseDTO> getEnseignantsBySpecialite(String specialite) {
+        List<Enseignant> enseignants = enseignantRepository.findBySpecialite(specialite);
+        return enseignants.stream()
+                .map(userMapper::toEnseignantResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<EnseignantResponseDTO> getAllEnseignants(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Enseignant> enseignants = enseignantRepository.findAllByRole(Role.ENSEIGNANT, pageable);
+
+        return enseignants.stream()
+                .map(userMapper::toEnseignantResponse)
+                .collect(Collectors.toList());
+    }
+
+    public Page<EnseignantResponseDTO> getAllEnseignants(Pageable pageable) {
+        Page<Enseignant> enseignantsPage = enseignantRepository.findAllByRole(Role.ENSEIGNANT, pageable);
+        return enseignantsPage.map(userMapper::toEnseignantResponse);
+    }
+    public List<EnseignantResponseDTO> searchEnseignantsByName(String keyword) {
+        List<Enseignant> enseignants = enseignantRepository.findByNomContainingOrPrenomContainingAndRole(
+                keyword, keyword, Role.ENSEIGNANT
+        );
+        return enseignants.stream()
+                .map(userMapper::toEnseignantResponse)
+                .collect(Collectors.toList());
+    }
+
+    public EnseignantResponseDTO updateEnseignant(UUID id, UpdateUserRequest dto) {
+        Enseignant enseignant = enseignantRepository.findByIdAndRole(id, Role.ENSEIGNANT)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Enseignant not found with id: " + id
+                ));
+
+        if (dto.getEmail() != null && !dto.getEmail().equals(enseignant.getEmail())) {
+            userRepository.findByEmail(dto.getEmail())
+                    .ifPresent(existingUser -> {
+                        throw new UserAlreadyExistsException("Email already exists: " + dto.getEmail());
+                    });
+        }
+
+        if (dto.getNom() != null) enseignant.setNom(dto.getNom());
+        if (dto.getPrenom() != null) enseignant.setPrenom(dto.getPrenom());
+        if (dto.getEmail() != null) enseignant.setEmail(dto.getEmail());
+        if (dto.getPhone() != null) enseignant.setPhone(dto.getPhone());
+        if (dto.getDateNaissance() != null) enseignant.setDateNaissance(dto.getDateNaissance());
+
+        if (dto.getSpecialite() != null) enseignant.setSpecialite(dto.getSpecialite());
+        if (dto.getDateEmbauche() != null) enseignant.setDateEmbauche(dto.getDateEmbauche());
+
+
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            enseignant.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        Enseignant updated = userRepository.save(enseignant);
+        return userMapper.toEnseignantResponse(updated);
+    }
+
+    public void deleteEnseignant(UUID id) {
+        Enseignant enseignant = enseignantRepository.findByIdAndRole(id, Role.ENSEIGNANT)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Enseignant not found with id: " + id
+                ));
+
+        userRepository.delete(enseignant);
+    }
+
+
+//===============================================================================================================
     //Eleve management
+// ===============================================================================================================
     public EleveResponseDTO createEleve(CreateUserRequest dto)
     {
         if(userRepository.findByEmail(dto.getEmail()).isPresent())

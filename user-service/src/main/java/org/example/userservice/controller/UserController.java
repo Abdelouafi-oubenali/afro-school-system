@@ -3,15 +3,20 @@ package org.example.userservice.controller;
 import jakarta.validation.Valid;
 import org.example.userservice.dto.*;
 import org.example.userservice.entity.Admin;
+import org.example.userservice.entity.Enseignant;
 import org.example.userservice.entity.User;
 import org.example.userservice.enums.Role;
 import org.example.userservice.repository.UserRepository;
 import org.example.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.stream.events.EndDocument;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -136,7 +141,36 @@ public class UserController {
         return userService.createEnseignent(dto) ;
     }
 
-    //Eleve management
+    @GetMapping("/enseignent")
+    public Page<EnseignantResponseDTO> getAllEnseigment(Pageable pageable)
+    {
+        return userService.getAllEnseignants(pageable) ;
+    }
+
+    @GetMapping("/enseignent/{id}")
+    public EnseignantResponseDTO getEnseigmentById(@PathVariable UUID id)
+    {
+        return userService.getEnseignantById(id) ;
+    }
+
+    @PutMapping("/enseignent/{id}")
+    public ResponseEntity<EnseignantResponseDTO> updateEnseigmentById(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateUserRequest dto) {
+
+        EnseignantResponseDTO updated = userService.updateEnseignant(id, dto);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/enseignent/{id}")
+    public void deleteEnseigment(@PathVariable UUID id)
+    {
+        userService.deleteEnseignant(id);
+    }
+
+
+
+    //Eleve management =======================================================================================
     @PostMapping("eleve")
     public EleveResponseDTO createEleve(@Valid @RequestBody CreateUserRequest dto)
     {

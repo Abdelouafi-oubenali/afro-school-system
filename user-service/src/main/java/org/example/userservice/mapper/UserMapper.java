@@ -24,5 +24,7 @@ public interface UserMapper {
 
     //Parent
     ParentResponseDTO toParentResponse(Parent parent) ;
+
+    EnseignantResponseDTO toEnseignantResponse(Enseignant enseignant);
 }
 
