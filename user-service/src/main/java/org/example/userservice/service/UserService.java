@@ -1,9 +1,6 @@
 package org.example.userservice.service;
 
-import org.example.userservice.dto.AdminResponseDTO;
-import org.example.userservice.dto.CreateUserRequest;
-import org.example.userservice.dto.EnseignantResponseDTO;
-import org.example.userservice.dto.UserResponseDTO;
+import org.example.userservice.dto.*;
 import org.example.userservice.entity.Admin;
 import org.example.userservice.entity.Eleve;
 import org.example.userservice.entity.Enseignant;
@@ -85,7 +82,8 @@ public class UserService {
     }
 
 
-    // Admin 
+
+    // Admin
     public AdminResponseDTO createAdmin(CreateUserRequest dto) {
 
         if(userRepository.findByEmail(dto.getEmail()).isPresent()){
@@ -136,6 +134,34 @@ public class UserService {
 
         Enseignant save = userRepository.save(enseignant) ;
         return  userMapper.toEnseigmentResponse(save) ;
+
+    }
+
+
+    //Eleve Managment
+    public EleveResponseDTO createEleve(CreateUserRequest dto)
+    {
+        if(userRepository.findByEmail(dto.getEmail()).isPresent())
+        {
+            throw new UserAlreadyExistsException("User already exists with email: " + dto.getEmail());
+        }
+
+        Eleve eleve = new Eleve();
+
+        eleve.setId(UUID.randomUUID());
+        eleve.setNom(dto.getNom());
+        eleve.setPrenom(dto.getPrenom());
+        eleve.setEmail(dto.getEmail());
+        eleve.setPassword(passwordEncoder.encode(dto.getPassword()));
+        eleve.setPhone(dto.getPhone());
+        eleve.setDateNaissance(dto.getDateNaissance());
+        eleve.setRole(Role.ELEVE);
+        //eleve.setClasse();
+
+        Eleve save = userRepository.save(eleve) ;
+
+        return userMapper.toEleveResponse(save) ;
+
 
     }
 

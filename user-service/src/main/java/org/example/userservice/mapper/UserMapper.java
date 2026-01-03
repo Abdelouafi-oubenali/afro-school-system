@@ -1,6 +1,7 @@
 package org.example.userservice.mapper;
 
 import org.example.userservice.dto.AdminResponseDTO;
+import org.example.userservice.dto.EleveResponseDTO;
 import org.example.userservice.dto.EnseignantResponseDTO;
 import org.example.userservice.dto.UserResponseDTO;
 import org.example.userservice.entity.*;
@@ -20,6 +21,10 @@ public interface UserMapper {
 
     //enseignant
     EnseignantResponseDTO toEnseigmentResponse(Enseignant enseignant) ;
+
+    //Eleve
+
+    EleveResponseDTO toEleveResponse(Eleve eleve) ;
 
 }
 
