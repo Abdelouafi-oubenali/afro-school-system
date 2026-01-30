@@ -37,14 +37,13 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/api/auth/**",
-                                "/api/test/public",
-                                "/api/users/**"
+                                "/api/test/public"
                         ).permitAll()
 
                         .requestMatchers("/api/users/create-admin").authenticated()
                         //.requestMatchers("/api/users/**").authenticated()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

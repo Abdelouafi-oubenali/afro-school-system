@@ -308,8 +308,8 @@ public class UserService {
         }
 
         Eleve eleve = new Eleve();
-
         eleve.setId(UUID.randomUUID());
+
         eleve.setNom(dto.getNom());
         eleve.setPrenom(dto.getPrenom());
         eleve.setEmail(dto.getEmail());
@@ -327,7 +327,7 @@ public class UserService {
 
     public EleveResponseDTO getEleveById(UUID id) {
         Eleve eleve = eleveRepository.findByIdAndRole(id, Role.ELEVE)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new ForbiddenException(
                         "Élève not found with id: " + id
                 ));
         return userMapper.toEleveResponse(eleve);
@@ -335,7 +335,7 @@ public class UserService {
 
     public EleveResponseDTO getEleveByEmail(String email) {
         Eleve eleve = eleveRepository.findByEmailAndRole(email, Role.ELEVE)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new ForbiddenException(
                         "Élève not found with email: " + email
                 ));
         return userMapper.toEleveResponse(eleve);
