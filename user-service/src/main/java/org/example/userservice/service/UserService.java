@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.example.userservice.dto.*;
 import org.example.userservice.entity.*;
 import org.example.userservice.enums.Role;
+import org.example.userservice.exception.ForbiddenException;
 import org.example.userservice.exception.InvalidEnseignantException;
 import org.example.userservice.exception.ResourceNotFoundException;
 import org.example.userservice.exception.UserAlreadyExistsException;
@@ -141,6 +142,7 @@ public class UserService {
                     });
         }
 
+
         if (dto.getNom() != null) admin.setNom(dto.getNom());
         if (dto.getPrenom() != null) admin.setPrenom(dto.getPrenom());
         if (dto.getEmail() != null) admin.setEmail(dto.getEmail());
@@ -217,7 +219,7 @@ public class UserService {
 
     public EnseignantResponseDTO getEnseignantById(UUID id) {
         Enseignant enseignant = enseignantRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new ForbiddenException (
                         "Enseignant not found with id: " + id
                 ));
         return userMapper.toEnseignantResponse(enseignant);
@@ -225,7 +227,7 @@ public class UserService {
 
     public EnseignantResponseDTO getEnseignantByEmail(String email) {
         Enseignant enseignant = enseignantRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new ForbiddenException(
                         "Enseignant not found with email: " + email
                 ));
         return userMapper.toEnseignantResponse(enseignant);
@@ -262,16 +264,10 @@ public class UserService {
 
     public EnseignantResponseDTO updateEnseignant(UUID id, UpdateUserRequest dto) {
         Enseignant enseignant = enseignantRepository.findByIdAndRole(id, Role.ENSEIGNANT)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new ForbiddenException(
                         "Enseignant not found with id: " + id
                 ));
 
-        if (dto.getEmail() != null && !dto.getEmail().equals(enseignant.getEmail())) {
-            userRepository.findByEmail(dto.getEmail())
-                    .ifPresent(existingUser -> {
-                        throw new UserAlreadyExistsException("Email already exists: " + dto.getEmail());
-                    });
-        }
 
         if (dto.getNom() != null) enseignant.setNom(dto.getNom());
         if (dto.getPrenom() != null) enseignant.setPrenom(dto.getPrenom());
@@ -293,7 +289,7 @@ public class UserService {
 
     public void deleteEnseignant(UUID id) {
         Enseignant enseignant = enseignantRepository.findByIdAndRole(id, Role.ENSEIGNANT)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new ForbiddenException(
                         "Enseignant not found with id: " + id
                 ));
 

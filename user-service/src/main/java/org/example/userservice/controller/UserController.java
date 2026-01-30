@@ -128,10 +128,14 @@ public class UserController {
     }
 
     @PutMapping("/admins/{id}")
-    public AdminResponseDTO UpdateAdmin(@PathVariable @RequestBody UUID id , UpdateUserRequest dto)
-    {
-        return userService.updateAdmin(id , dto) ;
+    public AdminResponseDTO updateAdmin(
+            @PathVariable UUID id,
+            @RequestBody UpdateUserRequest dto
+    ) {
+        System.out.println("controller + =================== " + dto);
+        return userService.updateAdmin(id, dto);
     }
+
 
 
 
