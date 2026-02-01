@@ -15,6 +15,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gatewa" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>
