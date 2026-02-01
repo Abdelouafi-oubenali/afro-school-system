@@ -3,7 +3,6 @@ target/
 build/
 *.class
 *.jar
-!.mvn/wrapper/maven-wrapper.jar
 *.war
 *.ear
 *.nar
@@ -25,9 +24,11 @@ Thumbs.db
 # Log files
 *.log
 
+# Docker
+*.env
+.env.local
+
 # Package Files
 *.zip
 *.tar.gz
 *.rar
-
-

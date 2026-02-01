@@ -1,4 +1,4 @@
-# Maven
+# Maven / Gradle build
 target/
 build/
 *.class
@@ -29,5 +29,4 @@ Thumbs.db
 *.zip
 *.tar.gz
 *.rar
-
 

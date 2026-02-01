@@ -48,6 +48,8 @@ services:
       - "8080:8080"
     depends_on:
       - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
     networks:
       - school-network
 
