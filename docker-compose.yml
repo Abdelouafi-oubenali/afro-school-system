@@ -1,5 +1,8 @@
+version: "3.9"
+
 services:
 
+  # PostgreSQL pour les utilisateurs
   postgres-user:
     image: postgres:15
     container_name: postgres-user
@@ -14,6 +17,7 @@ services:
     networks:
       - school-network
 
+  # PgAdmin pour visualiser la base de données
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
@@ -27,23 +31,48 @@ services:
     networks:
       - school-network
 
+  # Eureka Server
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - school-network
+
+  # API Gateway
+  api-gateway:
+    build: ./api-gatewa
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    networks:
+      - school-network
+
+  # User Service
   user-service:
     build: ./user-service
     container_name: user-service
     depends_on:
       - postgres-user
+      - eureka-server
     ports:
       - "8081:8081"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user:5432/user_db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: user123
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
     networks:
       - school-network
 
+# Réseau commun
 networks:
   school-network:
     driver: bridge
 
+# Volumes pour persistance PostgreSQL
 volumes:
   user_db_data:
