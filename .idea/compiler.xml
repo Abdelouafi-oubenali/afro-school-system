@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="api-gatewa" />
+        <module name="class-service" />
         <module name="auth-service" />
         <module name="user-service" />
         <module name="eureka-server" />
