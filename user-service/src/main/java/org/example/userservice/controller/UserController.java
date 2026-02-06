@@ -37,6 +37,15 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @GetMapping("/test")
+    public Map<String, Object> testUsers() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("count", 3);
+        response.put("users", List.of("Alice", "Bob", "Charlie"));
+        return response;
+    }
+
 
     @PostMapping("/create-admin/test")
     public Map<String, Object> createAdminUser(@RequestBody Map<String, String> request) {

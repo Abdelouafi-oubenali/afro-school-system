@@ -1,0 +1,34 @@
+# Maven
+target/
+build/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.settings/
+.classpath
+.project
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Docker
+*.env
+.env.local
+
+# Package Files
+*.zip
+*.tar.gz
+*.rar
