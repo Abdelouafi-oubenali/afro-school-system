@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,8 +43,12 @@ public class AuthController {
             // Charger les détails de l'utilisateur
             UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
 
+                var roles = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .toList();
+
             // Générer les tokens
-            String accessToken = jwtService.generateAccessToken(userDetails.getUsername());
+                String accessToken = jwtService.generateAccessToken(userDetails.getUsername(), roles);
             String refreshToken = jwtService.generateRefreshToken(userDetails.getUsername());
 
             // Retourner la réponse
@@ -79,7 +84,12 @@ public class AuthController {
 
             String username = jwtService.getUsernameFromToken(refreshToken);
 
-            String newAccessToken = jwtService.generateAccessToken(username);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                var roles = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .toList();
+
+                String newAccessToken = jwtService.generateAccessToken(username, roles);
 
 
             TokenResponse response = new TokenResponse(
