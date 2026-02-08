@@ -17,7 +17,7 @@ public abstract class User {
 
     @Id
     private UUID id;
-
+    
     @Column(nullable = false)
     private String nom;
 
