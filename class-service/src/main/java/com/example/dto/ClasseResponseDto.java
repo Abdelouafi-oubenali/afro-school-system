@@ -1,6 +1,7 @@
 package com.example.dto;
 
 import com.example.enums.LevelClasse;
+import com.example.enums.NiveauScolaire;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ public class ClasseResponseDto {
     private UUID id;
     private String name;
     private LevelClasse levelClasse;
+    private NiveauScolaire niveauScolaire;
     private UUID enseignantPrincipal;
     private String anneeScolaire;
     private Integer capaciteMax;

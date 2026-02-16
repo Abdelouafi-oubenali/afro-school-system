@@ -1,6 +1,7 @@
 package com.example.entity;
 
 import com.example.enums.LevelClasse;
+import com.example.enums.NiveauScolaire;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.UUID;
@@ -23,6 +24,10 @@ public class Classe {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LevelClasse levelClasse;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "niveau_scolaire")
+    private NiveauScolaire niveauScolaire;
 
     @Column(name = "annee_scolaire")
     private String anneeScolaire;

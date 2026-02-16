@@ -1,6 +1,7 @@
 package com.example.dto;
 
 import com.example.enums.LevelClasse;
+import com.example.enums.NiveauScolaire;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
@@ -18,6 +19,8 @@ public class ClasseRequestDto {
 
     @NotNull(message = "Le niveau de la classe est obligatoire")
     private LevelClasse levelClasse;
+
+    private NiveauScolaire niveauScolaire;
 
     @NotNull(message = "L'enseignant principal est obligatoire")
     private UUID enseignantPrincipal;
