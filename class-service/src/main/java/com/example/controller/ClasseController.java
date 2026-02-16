@@ -56,4 +56,12 @@ public class ClasseController {
         classeService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{classeId}/assign-student/{studentId}")
+    public ResponseEntity<Void> assignStudentToClasse(
+            @PathVariable UUID classeId,
+            @PathVariable UUID studentId) {
+        classeService.assignStudentToClasse(classeId, studentId);
+        return ResponseEntity.ok().build();
+    }
 }

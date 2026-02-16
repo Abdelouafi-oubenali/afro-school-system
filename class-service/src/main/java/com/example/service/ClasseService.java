@@ -17,4 +17,6 @@ public interface ClasseService {
     List<ClasseResponseDto> getAll();
 
     void delete(UUID id);
+
+    void assignStudentToClasse(UUID classeId, UUID studentId);
 }
