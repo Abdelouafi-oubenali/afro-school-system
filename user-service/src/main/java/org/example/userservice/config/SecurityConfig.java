@@ -42,7 +42,8 @@ public class SecurityConfig {
                                 "/",
                                 "/error",
                                 "/api/auth/**",
-                                "/api/test/public"
+                                "/api/test/public",
+                                "/api/users/students/**"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()

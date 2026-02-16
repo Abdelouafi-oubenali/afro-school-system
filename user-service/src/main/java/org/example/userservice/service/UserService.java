@@ -415,6 +415,22 @@ public List<EleveResponseDTO> getEleveByClasseid(UUID classeId) {
             .toList();
         }
 
+    public UUID getClasseIdByStudent(UUID studentId) {
+        Eleve eleve = eleveRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Student not found with id: " + studentId
+                ));
+        return eleve.getClasseId();
+    }
+
+    public void assignClasseToStudentInternal(UUID studentId, UUID classeId) {
+        Eleve eleve = eleveRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Student not found with id: " + studentId
+                ));
+        eleve.setClasseId(classeId);
+        userRepository.save(eleve);
+    }
 
         public EleveResponseDTO assignClassToEleve(UUID id, UUID classId) {
         Eleve eleve = eleveRepository.findById(id)

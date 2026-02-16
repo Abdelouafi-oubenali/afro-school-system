@@ -260,5 +260,15 @@ public class UserController {
         return userService.updateParent(id , dto) ;
     }
 
+    // Feign client endpoints for class-service
+    @GetMapping("/students/{id}/classe")
+    public UUID getClasseIdByStudent(@PathVariable UUID id) {
+        return userService.getClasseIdByStudent(id);
+    }
+
+    @PutMapping("/students/{id}/classe/{classeId}")
+    public void assignClasseToStudent(@PathVariable UUID id, @PathVariable UUID classeId) {
+        userService.assignClasseToStudentInternal(id, classeId);
+    }
 
 }
