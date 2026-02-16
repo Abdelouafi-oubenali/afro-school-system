@@ -10,7 +10,7 @@ import java.util.UUID;
 @Data
 public class Eleve extends User {
 
-    private UUID classe;
+    private UUID classeId;
 
 }
 

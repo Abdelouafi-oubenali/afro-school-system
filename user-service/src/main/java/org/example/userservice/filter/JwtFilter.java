@@ -53,6 +53,7 @@ public class JwtFilter extends OncePerRequestFilter {
             logger.debug("Extracted username from token: {}", username);
         } catch (Exception e) {
             logger.error("Failed to extract username from token: {}", e.getMessage());
+            request.setAttribute("authError", e.getMessage());
             filterChain.doFilter(request, response);
             return;
         }
@@ -79,9 +80,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 } else {
                     logger.warn("Token validation failed for user: {}", username);
+                    request.setAttribute("authError", "Invalid or expired JWT token");
                 }
             } catch (Exception e) {
                 logger.error("Failed to load user details or validate token: {}", e.getMessage());
+                request.setAttribute("authError", e.getMessage());
             }
         }
 

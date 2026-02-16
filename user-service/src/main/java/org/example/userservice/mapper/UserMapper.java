@@ -4,6 +4,7 @@ import org.example.userservice.dto.*;
 import org.example.userservice.entity.*;
 import org.example.userservice.enums.Role;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import static org.example.userservice.enums.Role.*;
 
@@ -20,6 +21,7 @@ public interface UserMapper {
     EnseignantResponseDTO toEnseigmentResponse(Enseignant enseignant) ;
 
     //Eleve
+    @Mapping(source = "classeId", target = "classe")
     EleveResponseDTO toEleveResponse(Eleve eleve) ;
 
     //Parent

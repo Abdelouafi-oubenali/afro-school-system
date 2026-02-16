@@ -403,6 +403,31 @@ public class UserService {
         return userMapper.toEleveResponse(updated);
     }
 
+public List<EleveResponseDTO> getEleveByClasseid(UUID classeId) {
+        List<Eleve> eleves = eleveRepository.findAllByClasseId(classeId);
+        if (eleves.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Élève not found with classe id: " + classeId
+            );
+        }
+        return eleves.stream()
+                .map(userMapper::toEleveResponse)
+            .toList();
+        }
+
+
+        public EleveResponseDTO assignClassToEleve(UUID id, UUID classId) {
+        Eleve eleve = eleveRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Élève not found with id: " + id
+                ));
+
+        eleve.setClasseId(classId);
+        Eleve updatedEleve = eleveRepository.save(eleve);
+
+        return userMapper.toEleveResponse(updatedEleve);
+    }
+
 
 
 //======================================================================================================================

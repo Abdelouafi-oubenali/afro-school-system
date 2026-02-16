@@ -18,5 +18,7 @@ public interface EleveRepository extends JpaRepository<Eleve, UUID> {
     List<Eleve> findAllByRole(Role role);
     Page<Eleve> findAllByRole(Role role, Pageable pageable);
     List<Eleve> findByNomContainingOrPrenomContainingAndRole(String str , String str2 , Role role) ;
+    List<Eleve> findAllByClasseId(UUID classeId);
+
 
 }

@@ -215,6 +215,17 @@ public class UserController {
         return userService.updateEleve(id,dto) ;
     }
 
+    @GetMapping({"/{classId}/class", "/class/{classId}"})
+    public List<EleveResponseDTO> getClassIdByEleveId(@PathVariable UUID classId) {
+        return userService.getEleveByClasseid(classId);
+
+    }
+
+    @PostMapping("/eleve/{id}/assign-class/{classId}")
+    public EleveResponseDTO assignClassToEleve(@PathVariable UUID id, @PathVariable UUID classId) {
+        return userService.assignClassToEleve(id, classId);
+    }
+
 
 
     //parent management ===============================================================
