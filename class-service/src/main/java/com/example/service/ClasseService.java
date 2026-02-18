@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.dto.ClasseRequestDto;
 import com.example.dto.ClasseResponseDto;
+import com.example.dto.EleveResponseDto;
 import com.example.entity.Classe;
 import java.util.List;
 import java.util.UUID;
@@ -19,4 +20,6 @@ public interface ClasseService {
     void delete(UUID id);
 
     void assignStudentToClasse(UUID classeId, UUID studentId);
+
+    List<EleveResponseDto> getStudentsByClasseId(UUID classeId);
 }

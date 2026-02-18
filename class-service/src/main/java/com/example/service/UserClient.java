@@ -1,8 +1,10 @@
 package com.example.service;
 import org.springframework.cloud.openfeign.FeignClient;
+import com.example.dto.EleveResponseDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -15,4 +17,7 @@ public interface UserClient {
     @PutMapping("/api/users/students/{id}/classe/{classeId}")
     void assignClasseToStudent(@PathVariable("id") UUID studentId,
                                @PathVariable("classeId") UUID classeId);
+
+    @GetMapping("/api/users/class/{classId}")
+    List<EleveResponseDto> getStudentsByClasseId(@PathVariable("classId") UUID classId);
 }

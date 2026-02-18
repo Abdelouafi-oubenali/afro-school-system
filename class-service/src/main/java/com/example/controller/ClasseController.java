@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.dto.ClasseRequestDto;
 import com.example.dto.ClasseResponseDto;
+import com.example.dto.EleveResponseDto;
 import com.example.service.ClasseService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -63,5 +64,10 @@ public class ClasseController {
             @PathVariable UUID studentId) {
         classeService.assignStudentToClasse(classeId, studentId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{classeId}/students")
+    public ResponseEntity<List<EleveResponseDto>> getStudentsByClasseId(@PathVariable UUID classeId) {
+        return ResponseEntity.ok(classeService.getStudentsByClasseId(classeId));
     }
 }
