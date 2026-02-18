@@ -23,6 +23,8 @@ public class Matiere {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "coefficient")
+    private Double coefficient;
 
     @Column(name = "est_actif")
     private boolean estActif = true;
