@@ -3,6 +3,7 @@ package com.example.service.impl;
 import com.example.dto.ClasseRequestDto;
 import com.example.dto.ClasseResponseDto;
 import com.example.dto.EleveResponseDto;
+import com.example.dto.EnseignantResponseDto;
 import com.example.entity.Classe;
 import com.example.mapper.ClasseMapper;
 import com.example.repository.ClasseRepository;
@@ -100,6 +101,9 @@ public class ClasseServiceImpl implements ClasseService , UserClient {
 
     @Override
     public void assignClasseToStudent(UUID studentId, UUID classeId) {
+        if (!classeRepository.existsById(classeId)) {
+            throw new RuntimeException("Classe introuvable avec l'id : " + classeId);
+        }
         userClient.assignClasseToStudent(studentId, classeId);
     }
 
@@ -110,4 +114,20 @@ public class ClasseServiceImpl implements ClasseService , UserClient {
         }
         return userClient.getStudentsByClasseId(classeId);
     }
+
+    @Override
+    public void assignEnseignantToClasse(UUID classeId, UUID enseignantId) {
+        if(!classeRepository.existsById(classeId)) {
+            throw new RuntimeException("Classe introuvable avec l'id : " + classeId);
+        }
+        userClient.assignEnseignantToClasse(enseignantId, classeId);
+    }
+
+    @Override
+    public List<EnseignantResponseDto> getEnseignantsByClasseId(UUID classeId) {
+        if(!classeRepository.existsById(classeId)) {
+            throw new RuntimeException("Classe introuvable avec l'id : " + classeId);
+        }
+        return userClient.getEnseignantsByClasseId(classeId);
+    }       
 }

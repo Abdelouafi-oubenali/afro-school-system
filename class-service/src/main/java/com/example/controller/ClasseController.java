@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.dto.ClasseRequestDto;
 import com.example.dto.ClasseResponseDto;
 import com.example.dto.EleveResponseDto;
+import com.example.dto.EnseignantResponseDto;
 import com.example.service.ClasseService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -69,5 +70,18 @@ public class ClasseController {
     @GetMapping("/{classeId}/students")
     public ResponseEntity<List<EleveResponseDto>> getStudentsByClasseId(@PathVariable UUID classeId) {
         return ResponseEntity.ok(classeService.getStudentsByClasseId(classeId));
+    }
+
+    @PutMapping("/{classeId}/assign-enseignant/{enseignantId}")
+    public ResponseEntity<Void> assignEnseignantToClasse(
+            @PathVariable UUID classeId,
+            @PathVariable UUID enseignantId) {
+        classeService.assignEnseignantToClasse(classeId, enseignantId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{classeId}/enseignants")
+    public ResponseEntity<List<EnseignantResponseDto>> getEnseignantsByClasseId(@PathVariable UUID classeId) {
+        return ResponseEntity.ok(classeService.getEnseignantsByClasseId(classeId));
     }
 }
