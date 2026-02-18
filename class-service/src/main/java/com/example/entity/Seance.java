@@ -12,8 +12,8 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "emploi_classe")
-public class EmploiClasse {
+@Table(name = "seance")
+public class Seance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -23,8 +23,9 @@ public class EmploiClasse {
     @JoinColumn(name = "classe_id", nullable = false)
     private Classe classe;
 
-    @Column(name = "matiere_id")
-    private UUID matiere;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "matiere_id", nullable = false)
+    private Matiere matiere;
 
     @Column(name = "enseignant_id", nullable = false)
     private UUID enseignant;
