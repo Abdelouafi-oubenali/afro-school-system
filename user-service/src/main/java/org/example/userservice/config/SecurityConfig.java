@@ -43,7 +43,8 @@ public class SecurityConfig {
                                 "/error",
                                 "/api/auth/**",
                                 "/api/test/public",
-                                "/api/users/students/**"
+                                "/api/users/students/**",
+                                "/api/users/enseignants/**"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()

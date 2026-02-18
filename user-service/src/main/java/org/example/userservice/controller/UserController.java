@@ -271,4 +271,14 @@ public class UserController {
         userService.assignClasseToStudentInternal(id, classeId);
     }
 
+    @PutMapping("/enseignants/{id}/classe/{classeId}")
+    public void assignEnseignantToClasse(@PathVariable UUID id, @PathVariable UUID classeId) {
+        userService.assignEnseignantToClasseInternal(id, classeId);
+    }
+
+    @GetMapping("/enseignants/class/{classeId}")
+    public List<EnseignantResponseDTO> getEnseignantsByClasseId(@PathVariable UUID classeId) {
+        return userService.getEnseignantsByClasseId(classeId);
+    }
+
 }
