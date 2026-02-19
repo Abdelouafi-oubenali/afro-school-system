@@ -597,3 +597,4 @@ public List<EleveResponseDTO> getEleveByClasseid(UUID classeId) {
     }
 
 }
+    

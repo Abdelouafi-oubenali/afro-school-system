@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,6 +47,18 @@ public class SeanceServiceimpl implements SeanceService {
                 .orElseThrow(() -> new RuntimeException("Matière non trouvée avec l'ID: " + seanceRequestDto.getMatiereId()));
 
         userClient.getEnseignantById(seanceRequestDto.getEnseignantId());
+
+        if (hasEnseignantSeance(null, seanceRequestDto.getEnseignantId(), seanceRequestDto.getJour(),
+                seanceRequestDto.getHeureDebut(), seanceRequestDto.getHeureFin())) {
+            throw new RuntimeException("L'enseignant a déjà une séance à cet horaire");
+        }
+
+        if (hasClasseSeance(null, seanceRequestDto.getClasseId(), seanceRequestDto.getJour(),
+                seanceRequestDto.getHeureDebut(), seanceRequestDto.getHeureFin())) {
+            throw new RuntimeException("La classe a déjà une séance à cet horaire");
+        }
+
+
 
         Seance seance = new Seance();
         seance.setClasse(classe);
@@ -158,6 +171,20 @@ public class SeanceServiceimpl implements SeanceService {
             seance.setHeureFin(seanceRequestDto.getHeureFin());
         }
 
+        UUID classeId = seance.getClasse().getId();
+        UUID enseignantId = seance.getEnseignant();
+        DayOfWeek jour = seance.getJour();
+        LocalTime heureDebut = seance.getHeureDebut();
+        LocalTime heureFin = seance.getHeureFin();
+
+        if (hasEnseignantSeance(id, enseignantId, jour, heureDebut, heureFin)) {
+            throw new RuntimeException("L'enseignant a déjà une séance à cet horaire");
+        }
+
+        if (hasClasseSeance(id, classeId, jour, heureDebut, heureFin)) {
+            throw new RuntimeException("La classe a déjà une séance à cet horaire");
+        }
+
         Seance updatedSeance = seanceRepository.save(seance);
         return seanceMapper.toDto(updatedSeance);
     }
@@ -185,6 +212,28 @@ public class SeanceServiceimpl implements SeanceService {
                 .filter(Seance::isEstActif)
                 .map(seanceMapper::toDto)
                 .toList();
+    }
+
+        private boolean hasEnseignantSeance(UUID excludeSeanceId, UUID enseignantId, DayOfWeek jour,
+                        LocalTime heureDebut, LocalTime heureFin) {
+        return seanceRepository.findAll()
+                .stream()
+            .filter(seance -> excludeSeanceId == null || !seance.getId().equals(excludeSeanceId))
+            .filter(seance -> seance.getEnseignant().equals(enseignantId))
+                .anyMatch(seance -> seance.getJour().equals(jour) &&
+                ((heureDebut.isBefore(seance.getHeureFin()) && heureFin.isAfter(seance.getHeureDebut())) ||
+                    (heureDebut.equals(seance.getHeureDebut()) || heureFin.equals(seance.getHeureFin()))));
+    }
+
+        private boolean hasClasseSeance(UUID excludeSeanceId, UUID classeId, DayOfWeek jour,
+                        LocalTime heureDebut, LocalTime heureFin) {
+        return seanceRepository.findAll()
+                .stream()
+            .filter(seance -> excludeSeanceId == null || !seance.getId().equals(excludeSeanceId))
+            .filter(seance -> seance.getClasse().getId().equals(classeId))
+                .anyMatch(seance -> seance.getJour().equals(jour) &&
+                ((heureDebut.isBefore(seance.getHeureFin()) && heureFin.isAfter(seance.getHeureDebut())) ||
+                    (heureDebut.equals(seance.getHeureDebut()) || heureFin.equals(seance.getHeureFin()))));
     }
 }
 
