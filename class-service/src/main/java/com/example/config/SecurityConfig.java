@@ -5,6 +5,7 @@ import com.example.exception.RestAuthenticationEntryPoint;
 import com.example.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -33,7 +34,11 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**", "/actuator/**").permitAll()
-                .requestMatchers("/api/classes/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/classes/**", "/api/matieres/**", "/api/seances/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/classes/**", "/api/matieres/**", "/api/seances/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/classes/**", "/api/matieres/**", "/api/seances/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/classes/**", "/api/matieres/**", "/api/seances/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/classes/**", "/api/matieres/**", "/api/seances/**").authenticated()
                 .anyRequest().authenticated())
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(restAuthenticationEntryPoint)
