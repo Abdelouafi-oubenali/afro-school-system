@@ -28,4 +28,7 @@ public interface UserClient {
 
     @GetMapping("/api/users/enseignants/class/{classId}")
     List<EnseignantResponseDto> getEnseignantsByClasseId(@PathVariable("classId") UUID classId);
+
+    @GetMapping("/api/users/enseignents/{id}")
+    EnseignantResponseDto getEnseignantById(@PathVariable("id") UUID enseignantId);
 }

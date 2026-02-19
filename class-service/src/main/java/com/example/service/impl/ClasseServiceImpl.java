@@ -15,7 +15,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ClasseServiceImpl implements ClasseService , UserClient {
+public class ClasseServiceImpl implements ClasseService {
 
 
     private final ClasseRepository classeRepository ;
@@ -95,19 +95,6 @@ public class ClasseServiceImpl implements ClasseService , UserClient {
     }
 
     @Override
-    public UUID getClasseIdByStudent(UUID studentId) {
-        return userClient.getClasseIdByStudent(studentId);
-    }
-
-    @Override
-    public void assignClasseToStudent(UUID studentId, UUID classeId) {
-        if (!classeRepository.existsById(classeId)) {
-            throw new RuntimeException("Classe introuvable avec l'id : " + classeId);
-        }
-        userClient.assignClasseToStudent(studentId, classeId);
-    }
-
-    @Override
     public List<EleveResponseDto> getStudentsByClasseId(UUID classeId) {
         if (!classeRepository.existsById(classeId)) {
             throw new RuntimeException("Classe introuvable avec l'id : " + classeId);
@@ -120,6 +107,7 @@ public class ClasseServiceImpl implements ClasseService , UserClient {
         if(!classeRepository.existsById(classeId)) {
             throw new RuntimeException("Classe introuvable avec l'id : " + classeId);
         }
+        userClient.getEnseignantById(enseignantId);
         userClient.assignEnseignantToClasse(enseignantId, classeId);
     }
 

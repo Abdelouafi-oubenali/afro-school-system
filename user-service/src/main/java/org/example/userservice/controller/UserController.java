@@ -281,4 +281,9 @@ public class UserController {
         return userService.getEnseignantsByClasseId(classeId);
     }
 
+    @GetMapping("/enseignents/{id}")
+    public EnseignantResponseDTO getEnseignantById(@PathVariable UUID id) {
+        return userService.getEnseignantById(id);
+    }
+
 }
