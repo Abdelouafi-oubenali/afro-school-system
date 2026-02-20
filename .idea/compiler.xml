@@ -9,7 +9,6 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gatewa" />
         <module name="class-service" />
-        <module name="auth-service" />
         <module name="user-service" />
         <module name="eureka-server" />
       </profile>
@@ -18,6 +17,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gatewa" options="-parameters" />
+      <module name="class-service" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>

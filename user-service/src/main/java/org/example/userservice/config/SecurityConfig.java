@@ -1,8 +1,10 @@
 package org.example.userservice.config;
 
 import org.example.userservice.filter.JwtFilter;
+import org.example.userservice.exception.RestAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,9 +25,11 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
-    public SecurityConfig(JwtFilter jwtFilter) {
+    public SecurityConfig(JwtFilter jwtFilter, RestAuthenticationEntryPoint restAuthenticationEntryPoint) {
         this.jwtFilter = jwtFilter;
+        this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
     }
 
     @Bean
@@ -36,9 +40,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
+                                "/error",
                                 "/api/auth/**",
-                                "/api/test/public"
+                                "/api/test/public",
+                                "/api/users/students/**",
+                                "/api/users/enseignants/**"
                         ).permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
 
                         .requestMatchers("/api/users/create-admin").authenticated()
                         //.requestMatchers("/api/users/**").authenticated()
@@ -46,6 +55,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                    .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(restAuthenticationEntryPoint)
+                    )
                 .sessionManagement(session ->    session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )

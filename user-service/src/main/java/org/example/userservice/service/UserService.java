@@ -403,6 +403,47 @@ public class UserService {
         return userMapper.toEleveResponse(updated);
     }
 
+public List<EleveResponseDTO> getEleveByClasseid(UUID classeId) {
+        List<Eleve> eleves = eleveRepository.findAllByClasseId(classeId);
+        if (eleves.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Élève not found with classe id: " + classeId
+            );
+        }
+        return eleves.stream()
+                .map(userMapper::toEleveResponse)
+            .toList();
+        }
+
+    public UUID getClasseIdByStudent(UUID studentId) {
+        Eleve eleve = eleveRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Student not found with id: " + studentId
+                ));
+        return eleve.getClasseId();
+    }
+
+    public void assignClasseToStudentInternal(UUID studentId, UUID classeId) {
+        Eleve eleve = eleveRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Student not found with id: " + studentId
+                ));
+        eleve.setClasseId(classeId);
+        userRepository.save(eleve);
+    }
+
+        public EleveResponseDTO assignClassToEleve(UUID id, UUID classId) {
+        Eleve eleve = eleveRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Élève not found with id: " + id
+                ));
+
+        eleve.setClasseId(classId);
+        Eleve updatedEleve = eleveRepository.save(eleve);
+
+        return userMapper.toEleveResponse(updatedEleve);
+    }
+
 
 
 //======================================================================================================================
@@ -531,5 +572,29 @@ public class UserService {
         return response;
     }
 
+    public void assignEnseignantToClasseInternal(UUID enseignantId, UUID classeId) {
+        Enseignant enseignant = enseignantRepository.findById(enseignantId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Enseignant not found with id: " + enseignantId
+                ));
+        if (enseignant.getClasses() == null) {
+            enseignant.setClasses(new java.util.ArrayList<>());
+        }
+        // Convert classeId to Long for classes list
+        Long classeIdLong = classeId.getMostSignificantBits();
+        if (!enseignant.getClasses().contains(classeIdLong)) {
+            enseignant.getClasses().add(classeIdLong);
+        }
+        userRepository.save(enseignant);
+    }
+
+    public List<EnseignantResponseDTO> getEnseignantsByClasseId(UUID classeId) {
+        List<Enseignant> enseignants = enseignantRepository.findAll();
+        return enseignants.stream()
+                .filter(e -> e.getClasses() != null && e.getClasses().contains(classeId.getMostSignificantBits()))
+                .map(userMapper::toEnseignantResponse)
+                .toList();
+    }
 
 }
+    

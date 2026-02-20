@@ -1,5 +1,6 @@
 package org.example.userservice.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,68 +15,69 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex) {
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(new ErrorResponse("error", ex.getMessage()));
+    public ResponseEntity<Map<String, Object>> handleUserAlreadyExists(UserAlreadyExistsException ex,
+                                                                       HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
     }
 
 
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<Map<String, Object>> handleForbidden(ForbiddenException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("status", 403);
-        body.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    public ResponseEntity<Map<String, Object>> handleForbidden(ForbiddenException ex,
+                                                               HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex,
+                                                                          HttpServletRequest request) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage())
         );
-        return ResponseEntity.badRequest().body(errors);
-    }
 
-    @ExceptionHandler(InvalidEnseignantException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidEnseignant(InvalidEnseignantException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Bad Request");
-        body.put("message", ex.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        body.put("error", HttpStatus.BAD_REQUEST.getReasonPhrase());
+        body.put("message", "Validation failed");
+        body.put("path", request.getRequestURI());
+        body.put("details", errors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(InvalidEnseignantException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidEnseignant(InvalidEnseignantException ex,
+                                                                       HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex,
+                                                                     HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
     }
 
-    public ResponseEntity<?> handleResourceNotFound(ResourceNotFoundException ex) {
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                Map.of(
-                        "timestamp", LocalDateTime.now(),
-                        "status", 404,
-                        "error", "NOT_FOUND",
-                        "message", ex.getMessage()
-                )
-        );
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex,
+                                                                      HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
     }
 
-}
-
-class ErrorResponse {
-    private String status;
-    private String message;
-
-    public ErrorResponse(String status, String message){
-        this.status = status;
-        this.message = message;
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex, HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), request.getRequestURI());
     }
 
-    public String getStatus() { return status; }
-    public String getMessage() { return message; }
+    private ResponseEntity<Map<String, Object>> buildErrorResponse(HttpStatus status,
+                                                                   String message,
+                                                                   String path) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("message", message);
+        body.put("path", path);
+        return ResponseEntity.status(status).body(body);
+    }
+
 }

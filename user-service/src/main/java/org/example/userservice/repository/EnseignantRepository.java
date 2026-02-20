@@ -20,6 +20,7 @@ public interface EnseignantRepository extends JpaRepository<Enseignant, UUID> {
     Page<Enseignant> findAllByRole(Role role , Pageable pageable) ;
     Optional<Enseignant> findByIdAndRole(UUID id , Role role) ;
     List<Enseignant> findByNomContainingOrPrenomContainingAndRole(String nom, String prenom, Role role);
+    
 
     boolean existsByMatricule(String matricule);
 }

@@ -215,6 +215,17 @@ public class UserController {
         return userService.updateEleve(id,dto) ;
     }
 
+    @GetMapping({"/{classId}/class", "/class/{classId}"})
+    public List<EleveResponseDTO> getClassIdByEleveId(@PathVariable UUID classId) {
+        return userService.getEleveByClasseid(classId);
+
+    }
+
+    @PostMapping("/eleve/{id}/assign-class/{classId}")
+    public EleveResponseDTO assignClassToEleve(@PathVariable UUID id, @PathVariable UUID classId) {
+        return userService.assignClassToEleve(id, classId);
+    }
+
 
 
     //parent management ===============================================================
@@ -249,5 +260,30 @@ public class UserController {
         return userService.updateParent(id , dto) ;
     }
 
+    // Feign client endpoints for class-service
+    @GetMapping("/students/{id}/classe")
+    public UUID getClasseIdByStudent(@PathVariable UUID id) {
+        return userService.getClasseIdByStudent(id);
+    }
+
+    @PutMapping("/students/{id}/classe/{classeId}")
+    public void assignClasseToStudent(@PathVariable UUID id, @PathVariable UUID classeId) {
+        userService.assignClasseToStudentInternal(id, classeId);
+    }
+
+    @PutMapping("/enseignants/{id}/classe/{classeId}")
+    public void assignEnseignantToClasse(@PathVariable UUID id, @PathVariable UUID classeId) {
+        userService.assignEnseignantToClasseInternal(id, classeId);
+    }
+
+    @GetMapping("/enseignants/class/{classeId}")
+    public List<EnseignantResponseDTO> getEnseignantsByClasseId(@PathVariable UUID classeId) {
+        return userService.getEnseignantsByClasseId(classeId);
+    }
+
+    @GetMapping("/enseignents/{id}")
+    public EnseignantResponseDTO getEnseignantById(@PathVariable UUID id) {
+        return userService.getEnseignantById(id);
+    }
 
 }
