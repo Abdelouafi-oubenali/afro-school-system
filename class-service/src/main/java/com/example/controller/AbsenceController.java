@@ -59,6 +59,12 @@ public class AbsenceController {
         return ResponseEntity.ok(absences);
     }
 
+    @GetMapping("/classe/{classeId}")
+    public ResponseEntity<List<AbsenceResponseDto>> getAbsencesByClasse(@PathVariable UUID classeId) {
+        List<AbsenceResponseDto> absences = absenceService.getAbsencesByClasse(classeId);
+        return ResponseEntity.ok(absences);
+    }
+
     @GetMapping("/date/{date}")
     public ResponseEntity<List<AbsenceResponseDto>> getAbsencesByDate(@PathVariable LocalDate date) {
         List<AbsenceResponseDto> absences = absenceService.getAbsencesByDate(date);

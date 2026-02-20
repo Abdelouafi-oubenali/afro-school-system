@@ -12,6 +12,7 @@ import java.util.UUID;
 public interface AbsenceRepository extends JpaRepository<Absence, UUID> {
     List<Absence> findByEleve(UUID eleveId);
     List<Absence> findByEnseignant(UUID enseignantId);
+    List<Absence> findByClasse(UUID classeId);
     List<Absence> findByDate(LocalDate date);
     List<Absence> findByEleveAndDate(UUID eleveId, LocalDate date);
 }

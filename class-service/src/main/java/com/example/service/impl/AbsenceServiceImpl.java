@@ -144,6 +144,15 @@ public class AbsenceServiceImpl implements AbsenceService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<AbsenceResponseDto> getAbsencesByClasse(UUID classeId) {
+        return absenceRepository.findByClasse(classeId)
+                .stream()
+                .map(absenceMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<AbsenceResponseDto> getAbsencesByDate(LocalDate date) {
         return absenceRepository.findByDate(date)
                 .stream()

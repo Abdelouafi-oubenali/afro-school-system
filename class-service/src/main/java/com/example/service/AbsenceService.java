@@ -21,6 +21,8 @@ public interface AbsenceService {
 
     List<AbsenceResponseDto> getAbsencesByEnseignant(UUID enseignantId);
 
+    List<AbsenceResponseDto> getAbsencesByClasse(UUID classeId);
+
     List<AbsenceResponseDto> getAbsencesByDate(LocalDate date);
 
     List<AbsenceResponseDto> getAbsencesByEleveAndDate(UUID eleveId, LocalDate date);
