@@ -22,6 +22,12 @@ public class Absence {
     @Column(name = "enseignant_id", nullable = false)
     private UUID enseignant;
 
+    @Column(name = "seance_id", nullable = false)
+    private UUID seance;
+
+    @Column(name = "classe_id", nullable = false)
+    private UUID classe;
+
     @Column(nullable = false)
     private LocalDate date;
 
