@@ -1,115 +1,148 @@
-  version: "3.9"
+version: "3.9"
 
-  services:
+services:
 
-    # PostgreSQL pour les utilisateurs
-    postgres-user:
-      image: postgres:15
-      container_name: postgres-user
-      environment:
-        POSTGRES_DB: user_db
-        POSTGRES_USER: user
-        POSTGRES_PASSWORD: user123
-      ports:
-        - "5433:5432"
-      volumes:
-        - user_db_data:/var/lib/postgresql/data
-      networks:
-        - school-network
+  # PostgreSQL pour les utilisateurs
+  postgres-user:
+    image: postgres:15
+    container_name: postgres-user
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user123
+    ports:
+      - "5433:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - school-network
 
-    # PgAdmin pour visualiser la base de données
-    pgadmin:  
-      image: dpage/pgadmin4
-      container_name: pgadmin
-      environment:
-        PGADMIN_DEFAULT_EMAIL: admin@admin.com
-        PGADMIN_DEFAULT_PASSWORD: admin
-      ports:
-        - "5050:80"
-      depends_on:
-        - postgres-user
-      networks:
-        - school-network
+  # PgAdmin pour visualiser la base de données
+  pgadmin:  
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres-user
+    networks:
+      - school-network
 
-    # PostgreSQL pour les classes
-    postgres-class:
-      image: postgres:15
-      container_name: postgres-class
-      environment:
-        POSTGRES_DB: class_db
-        POSTGRES_USER: class
-        POSTGRES_PASSWORD: class123
-      ports:
-        - "5434:5432"
-      volumes:
-        - class_db_data:/var/lib/postgresql/data
-      networks:
-        - school-network
+  # PostgreSQL pour les classes
+  postgres-class:
+    image: postgres:15
+    container_name: postgres-class
+    environment:
+      POSTGRES_DB: class_db
+      POSTGRES_USER: class
+      POSTGRES_PASSWORD: class123
+    ports:
+      - "5434:5432"
+    volumes:
+      - class_db_data:/var/lib/postgresql/data
+    networks:
+      - school-network
 
-    # Eureka Server
-    eureka-server:
-      build: ./eureka-server
-      container_name: eureka-server
-      ports:
-        - "8761:8761"
-      networks:
-        - school-network
+  # PostgreSQL pour les notes
+  postgres-note:
+    image: postgres:15
+    container_name: postgres-note
+    environment:
+      POSTGRES_DB: note_db
+      POSTGRES_USER: note
+      POSTGRES_PASSWORD: note123
+    ports:
+      - "5435:5432"
+    volumes:
+      - note_db_data:/var/lib/postgresql/data
+    networks:
+      - school-network
 
-    # API Gateway
-    api-gateway:
-      build: ./api-gatewa
-      container_name: api-gateway
-      ports:
-        - "8080:8080"
-      depends_on:
-        - eureka-server
-      environment:
-        - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      networks:
-        - school-network
+  # Eureka Server
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - school-network
 
-    # User Service
-    user-service:
-      build: ./user-service
-      container_name: user-service
-      depends_on:
-        - postgres-user
-        - eureka-server
-      ports:
-        - "8081:8081"
-      environment:
-        SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user:5432/user_db
-        SPRING_DATASOURCE_USERNAME: user
-        SPRING_DATASOURCE_PASSWORD: user123
-        EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-        JWT_SECRET: c2VjcmV0LWtleS1mb3Itand0LXRlc3RpbmctMjAyNC0xMi0zMQ==
-      networks:
-        - school-network
+  # API Gateway
+  api-gateway:
+    build: ./api-gatewa
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    networks:
+      - school-network
 
-    # calss Service
-    class-service:
-      build: ./class-service
-      container_name: class-service
-      depends_on:
-        - postgres-class
-        - eureka-server
-      ports:
-        - "8082:8082"
-      environment:
-        SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-class:5432/class_db
-        SPRING_DATASOURCE_USERNAME: class
-        SPRING_DATASOURCE_PASSWORD: class123
-        EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-        JWT_SECRET: c2VjcmV0LWtleS1mb3Itand0LXRlc3RpbmctMjAyNC0xMi0zMQ==
-      networks:
-        - school-network
-      
-  # Réseau commun
-  networks:
-    school-network:
-      driver: bridge
+  # User Service
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    depends_on:
+      - postgres-user
+      - eureka-server
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user:5432/user_db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: user123
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JWT_SECRET: c2VjcmV0LWtleS1mb3Itand0LXRlc3RpbmctMjAyNC0xMi0zMQ==
+    networks:
+      - school-network
 
-  # Volumes pour persistance PostgreSQL
-  volumes:
-    user_db_data:
-    class_db_data:
+  # calss Service
+  class-service:
+    build: ./class-service
+    container_name: class-service
+    depends_on:
+      - postgres-class
+      - eureka-server
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-class:5432/class_db
+      SPRING_DATASOURCE_USERNAME: class
+      SPRING_DATASOURCE_PASSWORD: class123
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JWT_SECRET: c2VjcmV0LWtleS1mb3Itand0LXRlc3RpbmctMjAyNC0xMi0zMQ==
+    networks:
+      - school-network
+
+  # Note Service
+  note-service:
+    build: ./note-service
+    container_name: note-service
+    depends_on:
+      - postgres-note
+      - eureka-server
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-note:5432/note_db
+      SPRING_DATASOURCE_USERNAME: note
+      SPRING_DATASOURCE_PASSWORD: note123
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - school-network
+
+# Réseau commun
+networks:
+  school-network:
+    driver: bridge
+
+# Volumes pour persistance PostgreSQL
+volumes:
+  user_db_data:
+  class_db_data:
+  note_db_data:

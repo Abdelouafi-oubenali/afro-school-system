@@ -10,6 +10,7 @@
         <module name="api-gatewa" />
         <module name="class-service" />
         <module name="user-service" />
+        <module name="note-service" />
         <module name="eureka-server" />
       </profile>
     </annotationProcessing>
@@ -19,6 +20,7 @@
       <module name="api-gatewa" options="-parameters" />
       <module name="class-service" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
+      <module name="note-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>
