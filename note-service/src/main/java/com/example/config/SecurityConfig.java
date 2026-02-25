@@ -3,6 +3,7 @@ package com.example.config;
 import com.example.exception.RestAccessDeniedHandler;
 import com.example.exception.RestAuthenticationEntryPoint;
 import com.example.filter.JwtAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,6 +34,8 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**", "/actuator/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/notes/**").hasAnyRole("ADMIN","ENSEIGNANT","PARENT" , "ELEVE")
+                .requestMatchers("/api/notes/**").hasAnyRole("ADMIN","ENSEIGNANT" )
                 .anyRequest().authenticated())
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(restAuthenticationEntryPoint)
