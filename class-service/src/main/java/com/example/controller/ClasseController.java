@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -64,6 +65,16 @@ public class ClasseController {
             @PathVariable UUID classeId,
             @PathVariable UUID studentId) {
         classeService.assignStudentToClasse(classeId, studentId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{classeId}/assign-students")
+    public ResponseEntity<Void> assignStudentsToClasse(
+            @PathVariable UUID classeId,
+            @RequestBody(required = false) List<UUID> studentIds,
+            @RequestParam(value = "studentIds", required = false) List<UUID> studentIdsFromQuery) {
+        List<UUID> ids = (studentIds != null && !studentIds.isEmpty()) ? studentIds : studentIdsFromQuery;
+        classeService.assignStudentsToClasse(classeId, ids);
         return ResponseEntity.ok().build();
     }
 

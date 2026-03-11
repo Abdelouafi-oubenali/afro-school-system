@@ -99,6 +99,18 @@ public class ClasseServiceImpl implements ClasseService {
     }
 
     @Override
+    public void assignStudentsToClasse(UUID classeId, List<UUID> studentIds) {
+        classeRepository.findById(classeId)
+                .orElseThrow(() -> new RuntimeException("Classe introuvable avec l'id : " + classeId));
+
+        if (studentIds == null || studentIds.isEmpty()) {
+            throw new RuntimeException("La liste des eleves ne doit pas etre vide");
+        }
+
+        studentIds.forEach(studentId -> userClient.assignClasseToStudent(studentId, classeId));
+    }
+
+    @Override
     public List<EleveResponseDto> getStudentsByClasseId(UUID classeId) {
         if (!classeRepository.existsById(classeId)) {
             throw new RuntimeException("Classe introuvable avec l'id : " + classeId);

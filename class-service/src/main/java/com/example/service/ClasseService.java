@@ -4,7 +4,6 @@ import com.example.dto.ClasseRequestDto;
 import com.example.dto.ClasseResponseDto;
 import com.example.dto.EleveResponseDto;
 import com.example.dto.EnseignantResponseDto;
-import com.example.entity.Classe;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +20,7 @@ public interface ClasseService {
     void delete(UUID id);
 
     void assignStudentToClasse(UUID classeId, UUID studentId);
+    void assignStudentsToClasse(UUID classeId, List<UUID> studentIds);
     void assignEnseignantToClasse(UUID classeId, UUID enseignantId);    
 
     List<EleveResponseDto> getStudentsByClasseId(UUID classeId);
