@@ -73,7 +73,11 @@ public class ClasseServiceImpl implements ClasseService {
     {
         return classeRepository.findAll()
             .stream()
-            .map(classeMapper::toDto)
+            .map(classe -> {
+                ClasseResponseDto dto = classeMapper.toDto(classe);
+                dto.setEleves(userClient.getStudentsByClasseId(classe.getId()));
+                return dto;
+            })
             .toList();
     }
 
@@ -88,7 +92,7 @@ public class ClasseServiceImpl implements ClasseService {
 
     @Override
     public void assignStudentToClasse(UUID classeId, UUID studentId) {
-        Classe classe = classeRepository.findById(classeId)
+        classeRepository.findById(classeId)
                 .orElseThrow(() -> new RuntimeException("Classe introuvable avec l'id : " + classeId));
 
         userClient.assignClasseToStudent(studentId, classeId);

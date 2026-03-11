@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -21,4 +22,5 @@ public class ClasseResponseDto {
     private String anneeScolaire;
     private Integer capaciteMax;
     private String salleAttribuee;
+    private List<EleveResponseDto> eleves;
 }

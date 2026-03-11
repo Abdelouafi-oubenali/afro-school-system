@@ -405,11 +405,11 @@ public class UserService {
 
 public List<EleveResponseDTO> getEleveByClasseid(UUID classeId) {
         List<Eleve> eleves = eleveRepository.findAllByClasseId(classeId);
-        if (eleves.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    "Élève not found with classe id: " + classeId
-            );
-        }
+        // if (eleves.isEmpty()) {
+        //     throw new ResourceNotFoundException(
+        //             "Élève not found with classe id: " + classeId
+        //     );
+        // }
         return eleves.stream()
                 .map(userMapper::toEleveResponse)
             .toList();
