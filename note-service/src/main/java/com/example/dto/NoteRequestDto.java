@@ -1,6 +1,7 @@
 
 package com.example.dto;
 
+import com.example.entity.NoteType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -23,4 +24,6 @@ public class NoteRequestDto {
     private UUID enseignantId;
 
     private Integer numeroExamen;
+
+    private NoteType typeNote;
 }

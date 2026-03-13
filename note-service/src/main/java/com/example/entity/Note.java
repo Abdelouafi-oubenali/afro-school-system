@@ -32,6 +32,10 @@ public class Note {
     @Column(name = "numero_examen")
     private Integer numeroExamen;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_note")
+    private NoteType typeNote;
+
     private String commentaire;
 
     private LocalDateTime createdAt;

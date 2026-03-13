@@ -43,6 +43,7 @@ public class NoteServiceImpl implements NoteService {
         n.setMatiereId(request.getMatiereId());
         n.setEnseignantId(request.getEnseignantId());
         n.setNumeroExamen(request.getNumeroExamen());
+        n.setTypeNote(request.getTypeNote());
         n.setClasseId(request.getClasseId());
         n.setValeur(request.getValeur());
         n.setCommentaire(request.getCommentaire());
@@ -95,6 +96,7 @@ public class NoteServiceImpl implements NoteService {
             n.setClasseId(request.getClasseId());
         }
         if (request.getNumeroExamen() != null) n.setNumeroExamen(request.getNumeroExamen());
+        if (request.getTypeNote() != null) n.setTypeNote(request.getTypeNote());
         if (request.getValeur() != null) n.setValeur(request.getValeur());
         if (request.getCommentaire() != null) n.setCommentaire(request.getCommentaire());
         Note saved = noteRepository.save(n);
@@ -153,6 +155,7 @@ public class NoteServiceImpl implements NoteService {
         dto.setClasseId(n.getClasseId());
         dto.setEnseignantId(n.getEnseignantId());
         dto.setNumeroExamen(n.getNumeroExamen());
+        dto.setTypeNote(n.getTypeNote());
         dto.setValeur(n.getValeur());
         dto.setCommentaire(n.getCommentaire());
         dto.setCreatedAt(n.getCreatedAt());

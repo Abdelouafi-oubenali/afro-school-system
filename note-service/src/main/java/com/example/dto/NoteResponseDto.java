@@ -1,5 +1,6 @@
 package com.example.dto;
 
+import com.example.entity.NoteType;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -16,4 +17,5 @@ public class NoteResponseDto {
     private LocalDateTime createdAt;
     private UUID enseignantId;
     private Integer numeroExamen;
+    private NoteType typeNote;
 }
