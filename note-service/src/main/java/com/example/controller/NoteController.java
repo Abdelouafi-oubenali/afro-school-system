@@ -1,18 +1,16 @@
 package com.example.controller;
 
+import com.example.dto.BilanMoyenneResponseDto;
+import com.example.dto.NoteRequestDto;
+import com.example.dto.NoteResponseDto;
+import com.example.service.NoteService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
-import com.example.dto.NoteRequestDto;
-import com.example.dto.NoteResponseDto;
-import com.example.service.NoteService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -43,6 +41,12 @@ public class NoteController {
             @PathVariable("eleveId") java.util.UUID eleveId,
             @PathVariable("matiereId") java.util.UUID matiereId) {
         return ResponseEntity.ok(noteService.getNotesByEleveAndMatiere(eleveId, matiereId));
+    }
+
+    @GetMapping("/eleve/{eleveId}/bilan-moyenne")
+    public ResponseEntity<BilanMoyenneResponseDto> getBilanMoyenne(
+            @PathVariable("eleveId") java.util.UUID eleveId) {
+        return ResponseEntity.ok(noteService.calculateBilanMoyenne(eleveId));
     }
 
     @GetMapping("/{id}")

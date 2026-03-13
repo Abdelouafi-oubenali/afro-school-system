@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.dto.BilanMoyenneResponseDto;
 import com.example.dto.NoteRequestDto;
 import com.example.dto.NoteResponseDto;
 
@@ -12,6 +13,7 @@ public interface NoteService {
     List<NoteResponseDto> getNotesByEleve(UUID eleveId);
     List<NoteResponseDto> getNotesByClasse(UUID classeId);
     List<NoteResponseDto> getNotesByEleveAndMatiere(UUID eleveId, UUID matiereId);
+    BilanMoyenneResponseDto calculateBilanMoyenne(UUID eleveId);
     List<NoteResponseDto> getAllNotes();
     NoteResponseDto updateNote(UUID id, NoteRequestDto request);
     void deleteNote(UUID id);
