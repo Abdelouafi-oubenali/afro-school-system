@@ -49,6 +49,12 @@ public class NoteController {
         return ResponseEntity.ok(noteService.calculateBilanMoyenne(eleveId));
     }
 
+    @GetMapping("/classe/{classeId}/bilans-moyenne")
+    public ResponseEntity<List<BilanMoyenneResponseDto>> getBilansMoyenneByClasse(
+            @PathVariable("classeId") java.util.UUID classeId) {
+        return ResponseEntity.ok(noteService.getBilansMoyenneByClasse(classeId));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<NoteResponseDto> getById(@PathVariable("id") java.util.UUID id) {
         return ResponseEntity.ok(noteService.getNoteById(id));

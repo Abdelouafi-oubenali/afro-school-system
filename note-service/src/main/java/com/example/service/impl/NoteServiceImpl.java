@@ -182,6 +182,74 @@ public class NoteServiceImpl implements NoteService {
         return noteRepository.findByClasseId(classeId).stream().map(this::toDto).toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<BilanMoyenneResponseDto> getBilansMoyenneByClasse(UUID classeId) {
+        List<Note> notesClasse = noteRepository.findByClasseId(classeId);
+        if (notesClasse.isEmpty()) {
+            return List.of();
+        }
+
+        Map<UUID, List<Note>> notesParEleve = notesClasse.stream()
+                .filter(note -> note.getEleveId() != null)
+                .collect(Collectors.groupingBy(Note::getEleveId));
+
+        List<BilanMoyenneResponseDto> bilans = new ArrayList<>();
+        for (Map.Entry<UUID, List<Note>> eleveEntry : notesParEleve.entrySet()) {
+            UUID eleveId = eleveEntry.getKey();
+            List<Note> notesEleve = eleveEntry.getValue();
+
+            Map<UUID, List<Note>> notesParMatiere = notesEleve.stream()
+                    .filter(note -> note.getMatiereId() != null)
+                    .collect(Collectors.groupingBy(Note::getMatiereId));
+
+            if (notesParMatiere.isEmpty()) continue;
+
+            List<MoyenneMatiereDto> detailsParMatiere = new ArrayList<>();
+            double sommePonderee = 0.0;
+            double sommeCoefficients = 0.0;
+
+            for (Map.Entry<UUID, List<Note>> matiereEntry : notesParMatiere.entrySet()) {
+                UUID matiereId = matiereEntry.getKey();
+                List<Note> notesMatiere = matiereEntry.getValue();
+
+                Double moyenneDevoir = moyenneParType(notesMatiere, NoteType.DEVOIR);
+                Double moyenneExamen = moyenneParType(notesMatiere, NoteType.EXAMEN);
+                Double moyenneFinale = calculMoyenneFinaleMatiere(moyenneDevoir, moyenneExamen);
+
+                if (moyenneFinale == null) continue;
+
+                MatiereResponseDto matiere = matiereClient.getMatiereById(matiereId);
+                double coefficient = extractCoefficient(matiere);
+
+                sommePonderee += moyenneFinale * coefficient;
+                sommeCoefficients += coefficient;
+
+                detailsParMatiere.add(new MoyenneMatiereDto(
+                        matiereId,
+                        matiere != null ? matiere.getNom() : null,
+                        round2(coefficient),
+                        moyenneDevoir != null ? round2(moyenneDevoir) : null,
+                        moyenneExamen != null ? round2(moyenneExamen) : null,
+                        round2(moyenneFinale)
+                ));
+            }
+
+            if (sommeCoefficients == 0.0) continue;
+
+            double moyenneGenerale = sommePonderee / sommeCoefficients;
+            bilans.add(new BilanMoyenneResponseDto(
+                    eleveId,
+                    round2(moyenneGenerale),
+                    round2(sommeCoefficients),
+                    detailsParMatiere.size(),
+                    detailsParMatiere
+            ));
+        }
+
+        return bilans;
+    }
+
     private void validateEleveExists(UUID eleveId) {
         try {
             userClient.getEleveById(eleveId);
