@@ -7,9 +7,11 @@ import com.example.service.AbsenceService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,6 +70,16 @@ public class AbsenceController {
     @GetMapping("/date/{date}")
     public ResponseEntity<List<AbsenceResponseDto>> getAbsencesByDate(@PathVariable LocalDate date) {
         List<AbsenceResponseDto> absences = absenceService.getAbsencesByDate(date);
+        return ResponseEntity.ok(absences);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<AbsenceResponseDto>> getAbsencesByFilters(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) UUID classeId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime heureDebut,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime heureFin) {
+        List<AbsenceResponseDto> absences = absenceService.getAbsencesByFilters(date, classeId, heureDebut, heureFin);
         return ResponseEntity.ok(absences);
     }
 

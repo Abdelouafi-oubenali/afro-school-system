@@ -13,11 +13,13 @@ import com.example.service.UserClient;
 import com.example.service.MatiereService;
 import com.example.service.SeanceService;
 import org.springframework.stereotype.Service;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.service.ClasseService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -155,6 +157,34 @@ public class AbsenceServiceImpl implements AbsenceService {
     @Transactional(readOnly = true)
     public List<AbsenceResponseDto> getAbsencesByDate(LocalDate date) {
         return absenceRepository.findByDate(date)
+                .stream()
+                .map(absenceMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AbsenceResponseDto> getAbsencesByFilters(LocalDate date, UUID classeId, LocalTime heureDebut, LocalTime heureFin) {
+        Specification<Absence> specification = (root, query, criteriaBuilder) -> {
+            List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
+
+            if (date != null) {
+                predicates.add(criteriaBuilder.equal(root.get("date"), date));
+            }
+            if (classeId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("classe"), classeId));
+            }
+            if (heureDebut != null) {
+                predicates.add(criteriaBuilder.equal(root.get("heureDebut"), heureDebut));
+            }
+            if (heureFin != null) {
+                predicates.add(criteriaBuilder.equal(root.get("heureFin"), heureFin));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        };
+
+        return absenceRepository.findAll(specification)
                 .stream()
                 .map(absenceMapper::toDto)
                 .toList();

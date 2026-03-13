@@ -4,6 +4,7 @@ import com.example.dto.AbsenceRequestDto;
 import com.example.dto.AbsenceBulkRequestDto;
 import com.example.dto.AbsenceResponseDto;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,6 +25,8 @@ public interface AbsenceService {
     List<AbsenceResponseDto> getAbsencesByClasse(UUID classeId);
 
     List<AbsenceResponseDto> getAbsencesByDate(LocalDate date);
+
+    List<AbsenceResponseDto> getAbsencesByFilters(LocalDate date, UUID classeId, LocalTime heureDebut, LocalTime heureFin);
 
     List<AbsenceResponseDto> getAbsencesByEleveAndDate(UUID eleveId, LocalDate date);
 
