@@ -61,6 +61,22 @@ services:
     networks:
       - school-network
 
+  # PostgreSQL pour les messages
+  postgres-message:
+    image: postgres:15
+    container_name: postgres-message
+    environment:
+      POSTGRES_DB: message_db
+      POSTGRES_USER: message
+      POSTGRES_PASSWORD: message123
+    ports:
+      - "5436:5432"
+    volumes:
+      - message_db_data:/var/lib/postgresql/data
+    networks:
+      - school-network
+
+
   # Eureka Server
   eureka-server:
     build: ./eureka-server
@@ -137,6 +153,23 @@ services:
     networks:
       - school-network
 
+  # Message + Notification Service
+  message-notification-service:
+    build: ./message-service
+    container_name: message-notification-service
+    depends_on:
+      - postgres-message
+      - eureka-server
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-message:5432/message_db
+      SPRING_DATASOURCE_USERNAME: message
+      SPRING_DATASOURCE_PASSWORD: message123
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - school-network
+
 # Réseau commun
 networks:
   school-network:
@@ -147,4 +180,5 @@ volumes:
   user_db_data:
   class_db_data:
   note_db_data:
+  message_db_data:
 
