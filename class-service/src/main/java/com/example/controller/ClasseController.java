@@ -95,4 +95,9 @@ public class ClasseController {
     public ResponseEntity<List<EnseignantResponseDto>> getEnseignantsByClasseId(@PathVariable UUID classeId) {
         return ResponseEntity.ok(classeService.getEnseignantsByClasseId(classeId));
     }
+
+    @GetMapping("/enseignant/{enseignantId}")
+    public ResponseEntity<List<ClasseResponseDto>> getClassesByEnseignantId(@PathVariable UUID enseignantId) {
+        return ResponseEntity.ok(classeService.getClassesByEnseignantId(enseignantId));
+    }
 }

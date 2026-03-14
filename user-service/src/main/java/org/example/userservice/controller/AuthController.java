@@ -3,6 +3,7 @@ package org.example.userservice.controller;
 import org.example.userservice.dto.AuthRequest;
 import org.example.userservice.dto.RefreshTokenRequest;
 import org.example.userservice.dto.TokenResponse;
+import org.example.userservice.entity.User;
 import org.example.userservice.service.CustomUserDetailsService;
 import org.example.userservice.service.JwtService;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,6 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
         try {
-            // Authentifier l'utilisateur
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             authRequest.getEmail(),
@@ -40,22 +40,21 @@ public class AuthController {
                     )
             );
 
-            // Charger les détails de l'utilisateur
+            User user = userDetailsService.loadUserEntityByEmail(authRequest.getEmail());
             UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
 
                 var roles = userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .toList();
 
-            // Générer les tokens
-                String accessToken = jwtService.generateAccessToken(userDetails.getUsername(), roles);
-            String refreshToken = jwtService.generateRefreshToken(userDetails.getUsername());
+                String accessToken = jwtService.generateAccessToken(userDetails.getUsername(), user.getId(), roles);
+            String refreshToken = jwtService.generateRefreshToken(userDetails.getUsername(), user.getId());
 
-            // Retourner la réponse
             TokenResponse response = new TokenResponse(
                     accessToken,
                     refreshToken,
-                    15 * 60 // 15 minutes en secondes
+                    15 * 60,
+                    user.getId()
             );
 
             return ResponseEntity.ok(response);
@@ -89,11 +88,12 @@ public class AuthController {
                     .map(GrantedAuthority::getAuthority)
                     .toList();
 
-                String newAccessToken = jwtService.generateAccessToken(username, roles);
-
+                java.util.UUID userId = jwtService.getUserIdFromToken(refreshToken);
+                String newAccessToken = jwtService.generateAccessToken(username, userId, roles);
 
             TokenResponse response = new TokenResponse(
-                    newAccessToken
+                    newAccessToken,
+                    userId
             );
 
             return ResponseEntity.ok(response);

@@ -25,5 +25,6 @@ public interface ClasseService {
 
     List<EleveResponseDto> getStudentsByClasseId(UUID classeId);
     List<EnseignantResponseDto> getEnseignantsByClasseId(UUID classeId);
+    List<ClasseResponseDto> getClassesByEnseignantId(UUID enseignantId);
     
 }

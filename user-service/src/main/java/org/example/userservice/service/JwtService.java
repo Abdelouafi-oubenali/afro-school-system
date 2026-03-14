@@ -40,9 +40,10 @@ public class JwtService {
     }
 
     // Générer un Access Token
-    public String generateAccessToken(String username, Collection<String> roles) {
+    public String generateAccessToken(String username, UUID userId, Collection<String> roles) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", List.copyOf(roles));
+        claims.put("userId", userId.toString());
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
@@ -52,15 +53,19 @@ public class JwtService {
                 .compact();
     }
 
-    public String generateAccessToken(String username) {
-        return generateAccessToken(username, List.of());
+    public String generateAccessToken(String username, Collection<String> roles) {
+        return generateAccessToken(username, UUID.randomUUID(), roles);
     }
 
+    public String generateAccessToken(String username) {
+        return generateAccessToken(username, UUID.randomUUID(), List.of());
+    }
 
-    public String generateRefreshToken(String username) {
+    public String generateRefreshToken(String username, UUID userId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("tokenType", "refresh");
         claims.put("jti", UUID.randomUUID().toString());
+        claims.put("userId", userId.toString());
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -69,6 +74,15 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public String generateRefreshToken(String username) {
+        return generateRefreshToken(username, UUID.randomUUID());
+    }
+
+    public UUID getUserIdFromToken(String token) {
+        String userId = extractClaim(token, claims -> claims.get("userId", String.class));
+        return userId != null ? UUID.fromString(userId) : null;
     }
 
     public boolean validateToken(String token) {

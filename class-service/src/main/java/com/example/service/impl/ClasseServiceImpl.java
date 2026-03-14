@@ -120,11 +120,12 @@ public class ClasseServiceImpl implements ClasseService {
 
     @Override
     public void assignEnseignantToClasse(UUID classeId, UUID enseignantId) {
-        if(!classeRepository.existsById(classeId)) {
-            throw new RuntimeException("Classe introuvable avec l'id : " + classeId);
-        }
+        Classe classe = classeRepository.findById(classeId)
+                .orElseThrow(() -> new RuntimeException("Classe introuvable avec l'id : " + classeId));
         userClient.getEnseignantById(enseignantId);
         userClient.assignEnseignantToClasse(enseignantId, classeId);
+        classe.setEnseignantPrincipal(enseignantId);
+        classeRepository.save(classe);
     }
 
     @Override
@@ -133,5 +134,20 @@ public class ClasseServiceImpl implements ClasseService {
             throw new RuntimeException("Classe introuvable avec l'id : " + classeId);
         }
         return userClient.getEnseignantsByClasseId(classeId);
-    }       
+    }
+
+    @Override
+    public List<ClasseResponseDto> getClassesByEnseignantId(UUID enseignantId) {
+        // Validate enseignant existence against user-service.
+        userClient.getEnseignantById(enseignantId);
+
+        return classeRepository.findAllByEnseignantPrincipal(enseignantId)
+                .stream()
+                .map(classe -> {
+                    ClasseResponseDto dto = classeMapper.toDto(classe);
+                    dto.setEleves(userClient.getStudentsByClasseId(classe.getId()));
+                    return dto;
+                })
+                .toList();
+    }
 }
