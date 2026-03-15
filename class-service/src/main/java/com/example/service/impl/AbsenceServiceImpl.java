@@ -3,6 +3,9 @@ package com.example.service.impl;
 import com.example.dto.AbsenceRequestDto;
 import com.example.dto.AbsenceBulkRequestDto;
 import com.example.dto.AbsenceResponseDto;
+import com.example.dto.AdminResponseDto;
+import com.example.dto.NotificationRequestDto;
+import com.example.dto.ParentResponseDto;
 import com.example.dto.SeanceResponseDto;
 import com.example.entity.Absence;
 import com.example.entity.Seance;
@@ -10,12 +13,15 @@ import com.example.mapper.AbsenceMapper;
 import com.example.repository.AbsenceRepository;
 import com.example.service.AbsenceService;
 import com.example.service.UserClient;
+import com.example.service.MessageNotificationClient;
 import com.example.service.MatiereService;
 import com.example.service.SeanceService;
 import org.springframework.stereotype.Service;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.service.ClasseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -27,21 +33,26 @@ import java.util.UUID;
 @Transactional
 public class AbsenceServiceImpl implements AbsenceService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AbsenceServiceImpl.class);
+
     private final AbsenceRepository absenceRepository;
     private final AbsenceMapper absenceMapper;
     private final UserClient userClient;
     private final MatiereService matiereService;
     private final SeanceService seanceService;
     private final ClasseService classeService;
+    private final MessageNotificationClient messageNotificationClient;
 
     public AbsenceServiceImpl(AbsenceRepository absenceRepository, AbsenceMapper absenceMapper,
-                             UserClient userClient, MatiereService matiereService, SeanceService seanceService, ClasseService classeService) {
+                             UserClient userClient, MatiereService matiereService, SeanceService seanceService,
+                             ClasseService classeService, MessageNotificationClient messageNotificationClient) {
         this.absenceRepository = absenceRepository;
         this.absenceMapper = absenceMapper;
         this.userClient = userClient;
         this.matiereService = matiereService;
         this.seanceService = seanceService;
         this.classeService = classeService;
+        this.messageNotificationClient = messageNotificationClient;
     }
 
     @Override
@@ -65,6 +76,7 @@ public class AbsenceServiceImpl implements AbsenceService {
         
         Absence absence = absenceMapper.toEntity(absenceRequestDto);
         Absence savedAbsence = absenceRepository.save(absence);
+        sendAbsenceNotifications(savedAbsence);
         return absenceMapper.toDto(savedAbsence);
     }
 
@@ -104,9 +116,44 @@ public class AbsenceServiceImpl implements AbsenceService {
                 .toList();
 
         List<Absence> savedAbsences = absenceRepository.saveAll(absences);
+        savedAbsences.forEach(this::sendAbsenceNotifications);
         return savedAbsences.stream()
                 .map(absenceMapper::toDto)
                 .toList();
+    }
+
+    private void sendAbsenceNotifications(Absence absence) {
+        String title = "Absence eleve";
+        String content = "Un eleve est marque absent. EleveId=" + absence.getEleve()
+                + ", classeId=" + absence.getClasse()
+                + ", date=" + absence.getDate();
+
+        List<ParentResponseDto> parents = userClient.getParentsByChildId(absence.getEleve());
+        for (ParentResponseDto parent : parents) {
+            sendNotificationSafely(parent.getId(), title, content);
+        }
+
+        List<AdminResponseDto> admins = userClient.getAllAdmins();
+        for (AdminResponseDto admin : admins) {
+            sendNotificationSafely(admin.getId(), title, content);
+        }
+    }
+
+    private void sendNotificationSafely(UUID userId, String title, String content) {
+        if (userId == null) {
+            return;
+        }
+
+        try {
+            NotificationRequestDto notification = new NotificationRequestDto();
+            notification.setUserId(userId);
+            notification.setTitle(title);
+            notification.setContent(content);
+            notification.setType("ALERT");
+            messageNotificationClient.sendNotification(notification);
+        } catch (Exception e) {
+            logger.warn("Notification non envoyee a userId {}: {}", userId, e.getMessage());
+        }
     }
 
     @Override

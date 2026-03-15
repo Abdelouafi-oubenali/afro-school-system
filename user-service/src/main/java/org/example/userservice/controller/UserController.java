@@ -242,6 +242,12 @@ public class UserController {
         return  userService.getAllParents();
     }
 
+    @GetMapping("/parents/child/{childId}")
+    public List<ParentResponseDTO> getParentsByChildId(@PathVariable UUID childId)
+    {
+        return userService.getParentsByChildId(childId);
+    }
+
     @GetMapping("/parent/{id}")
     public ParentResponseDTO getparentById(@PathVariable UUID id)
     {

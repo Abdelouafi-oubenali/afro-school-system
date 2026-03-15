@@ -1,7 +1,9 @@
 package com.example.service;
 import org.springframework.cloud.openfeign.FeignClient;
+import com.example.dto.AdminResponseDto;
 import com.example.dto.EleveResponseDto;
 import com.example.dto.EnseignantResponseDto;
+import com.example.dto.ParentResponseDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,4 +33,10 @@ public interface UserClient {
 
     @GetMapping("/api/users/enseignents/{id}")
     EnseignantResponseDto getEnseignantById(@PathVariable("id") UUID enseignantId);
+
+    @GetMapping("/api/users/parents/child/{childId}")
+    List<ParentResponseDto> getParentsByChildId(@PathVariable("childId") UUID childId);
+
+    @GetMapping("/api/users/admins")
+    List<AdminResponseDto> getAllAdmins();
 }
