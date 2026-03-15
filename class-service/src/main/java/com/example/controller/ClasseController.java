@@ -100,4 +100,9 @@ public class ClasseController {
     public ResponseEntity<List<ClasseResponseDto>> getClassesByEnseignantId(@PathVariable UUID enseignantId) {
         return ResponseEntity.ok(classeService.getClassesByEnseignantId(enseignantId));
     }
+
+    @GetMapping("/eleve/{eleveId}")
+    public ResponseEntity<ClasseResponseDto> getClasseByEleveId(@PathVariable UUID eleveId) {
+        return ResponseEntity.ok(classeService.getClasseByEleveId(eleveId));
+    }
 }

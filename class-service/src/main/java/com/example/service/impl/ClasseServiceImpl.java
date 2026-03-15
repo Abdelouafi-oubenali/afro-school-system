@@ -150,4 +150,19 @@ public class ClasseServiceImpl implements ClasseService {
                 })
                 .toList();
     }
+
+    @Override
+    public ClasseResponseDto getClasseByEleveId(UUID eleveId) {
+        UUID classeId = userClient.getClasseIdByStudent(eleveId);
+        if (classeId == null) {
+            throw new RuntimeException("Aucune classe trouvee pour l'eleve : " + eleveId);
+        }
+
+        Classe classe = classeRepository.findById(classeId)
+                .orElseThrow(() -> new RuntimeException("Classe introuvable avec l'id : " + classeId));
+
+        ClasseResponseDto dto = classeMapper.toDto(classe);
+        dto.setEleves(userClient.getStudentsByClasseId(classeId));
+        return dto;
+    }
 }
