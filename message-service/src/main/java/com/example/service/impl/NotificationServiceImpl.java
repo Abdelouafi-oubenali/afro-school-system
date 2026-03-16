@@ -7,15 +7,19 @@ import com.example.repository.NotificationRepository;
 import com.example.service.NotificationService;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public NotificationServiceImpl(NotificationRepository notificationRepository) {
+    public NotificationServiceImpl(NotificationRepository notificationRepository,
+                                   SimpMessagingTemplate messagingTemplate) {
         this.notificationRepository = notificationRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @Override
@@ -27,7 +31,16 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setType(request.getType());
 
         Notification saved = notificationRepository.save(notification);
-        return toDto(saved);
+        NotificationResponseDto dto = toDto(saved);
+
+        // Push en temps réel via WebSocket
+        messagingTemplate.convertAndSendToUser(
+                saved.getUserId().toString(),
+                "/queue/notifications",
+                dto
+        );
+
+        return dto;
     }
 
     @Override
