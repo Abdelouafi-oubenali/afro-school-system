@@ -3,9 +3,15 @@ pipeline {
 
     stages {
 
+        stage('Clean Workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+
         stage('Clone Repo') {
             steps {
-                git 'https://github.com/Abdelouafi-oubenali/afro-school-system.git'
+                git branch: 'jeckes-start', url: 'https://github.com/Abdelouafi-oubenali/afro-school-system.git'
             }
         }
 
@@ -17,13 +23,13 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                sh 'docker compose build'
+                sh 'docker compose -f docker-compose.yml build'
             }
         }
 
         stage('Run Containers') {
             steps {
-                sh 'docker compose up -d'
+                sh 'docker compose -f docker-compose.yml up -d'
             }
         }
 
