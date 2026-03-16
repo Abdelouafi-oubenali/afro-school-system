@@ -15,9 +15,51 @@ pipeline {
             }
         }
 
-        stage('Build Maven') {
+        stage('Build API Gateway') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                dir('api-gatewa') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build Class Service') {
+            steps {
+                dir('class-service') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build Message Service') {
+            steps {
+                dir('message-service') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build Note Service') {
+            steps {
+                dir('note-service') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build User Service') {
+            steps {
+                dir('user-service') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build Eureka Server') {
+            steps {
+                dir('eureka-server') {
+                    sh 'mvn clean package -DskipTests'
+                }
             }
         }
 
@@ -32,6 +74,5 @@ pipeline {
                 sh 'docker compose -f docker-compose.yml up -d'
             }
         }
-
     }
 }
