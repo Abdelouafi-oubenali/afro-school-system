@@ -5,7 +5,7 @@ pipeline {
 
         stage('Clone Repo') {
             steps {
-                git 'git@github.com:Abdelouafi-oubenali/afro-school-system.git'
+                git 'https://github.com/Abdelouafi-oubenali/afro-school-system.git'
             }
         }
 
