@@ -65,13 +65,28 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                sh 'docker compose -f docker-compose.yml build'
+                sh 'docker build -t eureka-server:latest ./eureka-server'
+                sh 'docker build -t api-gateway:latest ./api-gatewa'
+                sh 'docker build -t user-service:latest ./user-service'
+                sh 'docker build -t class-service:latest ./class-service'
+                sh 'docker build -t note-service:latest ./note-service'
+                sh 'docker build -t message-notification-service:latest ./message-service'
             }
         }
 
         stage('Run Containers') {
             steps {
-                sh 'docker compose -f docker-compose.yml up -d'
+                sh 'docker compose -f docker-compose.yml up -d postgres-user'
+                sh 'docker compose -f docker-compose.yml up -d postgres-class'
+                sh 'docker compose -f docker-compose.yml up -d postgres-note'
+                sh 'docker compose -f docker-compose.yml up -d postgres-message'
+                sh 'docker compose -f docker-compose.yml up -d pgadmin'
+                sh 'docker compose -f docker-compose.yml up -d eureka-server'
+                sh 'docker compose -f docker-compose.yml up -d api-gateway'
+                sh 'docker compose -f docker-compose.yml up -d user-service'
+                sh 'docker compose -f docker-compose.yml up -d class-service'
+                sh 'docker compose -f docker-compose.yml up -d note-service'
+                sh 'docker compose -f docker-compose.yml up -d message-notification-service'
             }
         }
     }
